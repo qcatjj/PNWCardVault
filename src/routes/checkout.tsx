@@ -232,13 +232,14 @@ function CheckoutPage() {
           <h1 className="font-display text-4xl">Checkout</h1>
           {mode === "pending" ? (
             <PendingPay />
-          ) : mode === "live" ? (
+          ) : mode === "live" || mode === "test" ? (
             <LivePay
               email={email}
               onEmail={setEmail}
               total={total}
               busy={busy}
               canPay={canPayLive}
+              test={mode === "test"}
               onPay={() => void onPayLive()}
             />
           ) : (
@@ -271,6 +272,20 @@ function ModeBanner({ mode, onFillTest }: { mode: PaymentMode; onFillTest: () =>
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-2.5 sm:px-6">
           <p className="text-xs text-muted-foreground">
             Pay on Stripe. Shipping address is collected there. Ships after the charge.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  if (mode === "test") {
+    return (
+      <div className="border-b border-border bg-muted">
+        <div className="mx-auto max-w-6xl px-4 py-2.5 sm:px-6">
+          <p className="text-xs text-muted-foreground">
+            <span className="mr-2 inline-flex rounded-sm bg-accent/25 px-1.5 py-0.5 font-medium tracking-wide text-live uppercase">
+              Test
+            </span>
+            Stripe test mode. Use card 4242 4242 4242 4242. No real money moves.
           </p>
         </div>
       </div>
@@ -359,6 +374,7 @@ function LivePay({
   busy,
   canPay,
   onPay,
+  test,
 }: {
   email: string;
   onEmail: (value: string) => void;
@@ -366,11 +382,14 @@ function LivePay({
   busy: boolean;
   canPay: boolean;
   onPay: () => void;
+  test?: boolean;
 }) {
   return (
     <>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        Pay with Stripe. You’ll add card and shipping on their page — we never store that here.
+        {test
+          ? "This is a Stripe test checkout. Use 4242 4242 4242 4242, any future date, any CVC. Nothing is charged."
+          : "Pay with Stripe. You’ll add card and shipping on their page — we never store that here."}
       </p>
       <form
         className="mt-8 space-y-5"
