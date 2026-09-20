@@ -83,10 +83,6 @@ export function getConnectorAccessToken(): string | null {
 
 export { isWorkspacePreview } from "../env.server.ts";
 
-// Digest of the last preview token the gate answered 401 for. The readiness
-// probe reports "not ready" while that exact token is still the one on the
-// request, so the client waits for the preview panel to push a fresh token
-// instead of re-calling the gate with a token already known to be rejected.
 let rejectedTokenDigest: string | null = null;
 
 function tokenDigest(token: string): string {
@@ -101,11 +97,6 @@ function noteTokenAccepted(token: string): void {
   if (rejectedTokenDigest === tokenDigest(token)) rejectedTokenDigest = null;
 }
 
-/**
- * True when the inbound request carries a connector token the gate has not
- * rejected. This is what the preview readiness probe reports; it never calls
- * the gate.
- */
 export function isConnectorTokenReady(): boolean {
   const token = inboundContext().token;
   return token !== null && tokenDigest(token) !== rejectedTokenDigest;
@@ -206,9 +197,6 @@ function pendingTokenResult(reason: string): CallToolResult {
   };
 }
 
-// Deployed apps only reach here when the request bypassed the gate (the gate
-// injects the token on every proxied request), so a sign-in redirect cannot
-// fix it: no loginRequired / loginUrl.
 function missingAuthResult(): CallToolResult {
   if (isWorkspacePreview()) return pendingTokenResult(PENDING_TOKEN_MISSING);
   return {
@@ -278,7 +266,9 @@ function tokenIdentityKey(token: string): string {
             .digest("base64url");
         }
       }
-    } catch {}
+    } catch {
+      /* ignore invalid token payload */
+    }
   }
   return createHash("sha256").update(token).digest("base64url");
 }
