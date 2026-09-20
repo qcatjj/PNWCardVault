@@ -8,7 +8,7 @@ export const Route = createFileRoute("/scores")({
   component: Scores,
 });
 
-const ORDER = ["NBA", "WNBA", "NFL", "MLB", "CFB"];
+const ORDER = ["NBA", "WNBA", "NFL", "MLB"];
 
 function Scores() {
   const initial = Route.useLoaderData();

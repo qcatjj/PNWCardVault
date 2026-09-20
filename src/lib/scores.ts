@@ -20,7 +20,6 @@ const BOARDS = [
   { sport: "WNBA", url: "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard" },
   { sport: "NFL", url: "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard" },
   { sport: "MLB", url: "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard" },
-  { sport: "CFB", url: "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard" },
 ] as const;
 
 const RANK = { in: 0, pre: 1, post: 2 } as const;
@@ -44,7 +43,7 @@ export const getScoreboard = createServerFn({ method: "GET" }).handler(async ():
 export function catalogSports(sport: string): SportId[] {
   if (sport === "NBA") return ["basketball"];
   if (sport === "WNBA") return ["wnba", "basketball"];
-  if (sport === "NFL" || sport === "CFB") return ["football"];
+  if (sport === "NFL") return ["football"];
   if (sport === "MLB") return ["baseball"];
   return [];
 }
@@ -52,7 +51,7 @@ export function catalogSports(sport: string): SportId[] {
 export function primarySport(sport: string): SportId | null {
   if (sport === "NBA") return "basketball";
   if (sport === "WNBA") return "wnba";
-  if (sport === "NFL" || sport === "CFB") return "football";
+  if (sport === "NFL") return "football";
   if (sport === "MLB") return "baseball";
   return null;
 }
