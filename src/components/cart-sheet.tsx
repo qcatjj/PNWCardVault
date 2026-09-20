@@ -17,7 +17,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-background/70" />
-        <Dialog.Content className="fixed top-0 right-0 bottom-0 left-auto z-50 flex h-dvh w-full max-w-md flex-col border-l border-border bg-card shadow-xl outline-none">
+        <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 flex h-[min(92dvh,40rem)] w-full flex-col rounded-t-3xl border-t border-border bg-card shadow-xl outline-none md:inset-y-0 md:right-0 md:left-auto md:h-dvh md:max-w-md md:rounded-none md:border-t-0 md:border-l">
           <div className="flex items-center justify-between border-b border-border px-5 py-4">
             <Dialog.Title className="font-display text-xl text-card-foreground">Cart</Dialog.Title>
             <Dialog.Close asChild>
@@ -87,7 +87,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
               </ul>
             )}
           </div>
-          <div className="border-t border-border p-5">
+          <div className="border-t border-border p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
             <div className="mb-3 flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
               <span className="tabular-nums font-medium">{formatPrice(total)}</span>

@@ -31,11 +31,10 @@ function Shop() {
   const search = Route.useSearch();
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">The hub</p>
-      <h1 className="mt-2 font-display text-4xl">Open boxes</h1>
-      <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-        Every card has its own buy link. Filter a box, open a listing, pay with Stripe. Ships after checkout.
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+      <h1 className="font-display text-3xl md:text-4xl">Shop</h1>
+      <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+        Filter a box, open a listing, pay with Stripe.
       </p>
 
       <div className="mt-8 flex flex-wrap gap-2">
@@ -115,7 +114,7 @@ function FilterChip({
       to={to}
       search={search}
       className={cn(
-        "rounded-full border px-3 py-1.5 text-sm transition-colors duration-150",
+        "inline-flex min-h-11 items-center rounded-full border px-3.5 text-sm transition-colors duration-150",
         active
           ? "border-primary bg-primary text-primary-foreground"
           : "border-border bg-card text-muted-foreground hover:text-foreground",

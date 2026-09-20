@@ -10,7 +10,7 @@ export function ProductCard({ product }: { product: Product }) {
     <Link
       to="/c/$slug"
       params={{ slug: product.slug }}
-      className="group block overflow-hidden rounded-lg border border-border bg-card outline-none transition-[box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-[var(--shadow-border-hover)] focus-visible:ring-2 focus-visible:ring-ring/70"
+      className="group block overflow-hidden rounded-2xl bg-card shadow-[var(--shadow-border)] outline-none transition-[box-shadow,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-[var(--shadow-border-hover)] focus-visible:ring-2 focus-visible:ring-ring/70"
     >
       <ProductMedia product={product} className="aspect-[2.5/3.5]" />
       <div className="space-y-2 p-4">
@@ -41,7 +41,7 @@ export function ProductCard({ product }: { product: Product }) {
 export function ProductGrid({ products }: { products: Product[] }) {
   if (products.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-card px-6 py-16 text-center">
+      <div className="rounded-2xl bg-card px-6 py-16 text-center shadow-[var(--shadow-border)]">
         <p className="font-display text-2xl text-foreground">This box is empty.</p>
         <p className="mt-2 text-sm text-muted-foreground">
           Cards land here as they’re listed from the desk. Try another sport, or check back soon.

@@ -35,7 +35,7 @@ function Home() {
   return (
     <main>
       <section className="border-b border-border hub-plate">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-14">
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-14">
           <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
             Pacific Northwest · singles shop
           </p>
@@ -46,7 +46,7 @@ function Home() {
                 <Link
                   to="/c/$slug"
                   params={{ slug: hero.slug }}
-                  className="relative block overflow-hidden rounded-lg border border-border bg-card"
+                  className="relative block overflow-hidden rounded-2xl bg-card shadow-[var(--shadow-border)]"
                 >
                   <ProductMedia product={hero} className="aspect-[2.5/3.5]" />
                 </Link>
@@ -124,7 +124,7 @@ function Home() {
               key={item.id}
               to="/shop"
               search={{ sport: item.id }}
-              className="rounded-lg border border-border bg-card px-4 py-5 hover:border-primary/40"
+              className="rounded-2xl bg-card px-4 py-5 shadow-[var(--shadow-border)] hover:shadow-[var(--shadow-border-hover)]"
             >
               <p className="font-mono text-xs tabular-nums text-muted-foreground">Box {item.box}</p>
               <p className="mt-2 font-display text-xl">{sportLabel(item.id)}</p>
