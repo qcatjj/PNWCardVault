@@ -547,3 +547,15 @@ export const setListingQty = createServerFn({ method: "POST" })
     if (!rows[0]) throw new Error("Listing not found.");
     return { ok: true };
   });
+
+export const deleteListing = createServerFn({ method: "POST" })
+  .validator(z.object({ productId: z.number().int() }))
+  .middleware([authMiddleware])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await requireOwner(context.userId);
+    const { getSql } = await import("./db");
+    const sql = await getSql();
+    const rows = await sql.query<{ id: number }>(`delete from products where id = $1 returning id`, [data.productId]);
+    if (!rows[0]) throw new Error("Listing not found.");
+    return { ok: true };
+  });

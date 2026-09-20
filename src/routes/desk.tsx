@@ -14,7 +14,7 @@ import { DeskAuth } from "@/components/desk-auth";
 import { UserButton } from "@/lib/auth/gates";
 import { authEnabled } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
-import { createListing, getInventory, setListingQty, type Inventory } from "@/lib/catalog";
+import { createListing, deleteListing, getInventory, setListingQty, type Inventory } from "@/lib/catalog";
 import { KINDS, productName, resolveSport, SPORTS, type Product } from "@/lib/catalog-types";
 import type { CardMatch } from "@/lib/card-images";
 import { readCardFromPhoto, type CardIdentity } from "@/lib/card-read";
@@ -283,6 +283,7 @@ function InventoryPanel() {
   const router = useRouter();
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [busy, setBusy] = useState<number | null>(null);
+  const [confirmId, setConfirmId] = useState<number | null>(null);
 
   async function refresh() {
     const next = await getInventory();
@@ -306,6 +307,25 @@ function InventoryPanel() {
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not update stock.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function remove(product: Product) {
+    if (busy) return;
+    if (confirmId !== product.id) {
+      setConfirmId(product.id);
+      return;
+    }
+    setBusy(product.id);
+    try {
+      await deleteListing({ data: { productId: product.id } });
+      toast.success("Listing deleted.");
+      setConfirmId(null);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not delete that listing.");
     } finally {
       setBusy(null);
     }
@@ -350,6 +370,15 @@ function InventoryPanel() {
                       Restock
                     </Button>
                   )}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={confirmId === item.id ? "destructive" : "outline"}
+                    disabled={busy !== null}
+                    onClick={() => void remove(item)}
+                  >
+                    {confirmId === item.id ? "Remove?" : "Delete"}
+                  </Button>
                 </div>
               </li>
             ))}
