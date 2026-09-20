@@ -2,11 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "tanstack-start",
   "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "fluid": true,
-  "functions": {
-    "__server": {
-      "maxDuration": 60
-    }
-  }
+  "installCommand": "npm install"
 }
