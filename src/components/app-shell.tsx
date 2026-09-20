@@ -3,6 +3,7 @@ import { Home, LayoutGrid, Lock, Search, ShoppingBag } from "lucide-react";
 import { type FormEvent, type ReactNode, useState } from "react";
 import { CartButton, CartSheet } from "@/components/cart-sheet";
 import { HubMark } from "@/components/hub-mark";
+import { LiveTicker } from "@/components/live-ticker";
 import { Input } from "@/components/ui/input";
 import { cartCount, useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
@@ -62,6 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <CartButton onClick={() => setCartOpen(true)} />
           </div>
         </div>
+        <LiveTicker />
       </header>
       <div className="min-w-0 flex-1 pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
       <footer className="hidden border-t border-border hub-plate md:block">

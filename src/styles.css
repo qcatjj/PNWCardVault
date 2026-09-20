@@ -77,7 +77,11 @@
   }
 
   .ticker {
-    animation: ticker 28s linear infinite;
+    animation: ticker 36s linear infinite;
+  }
+
+  .ticker-track:hover .ticker {
+    animation-play-state: paused;
   }
 
   .live-dot {
