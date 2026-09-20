@@ -89,15 +89,23 @@ function createNeonSql(): Promise<Sql> {
   globalRef.__pgSqlPromise__ ??= (async () => {
     // Regular Postgres driver: node-postgres (`pg`) — works with Supabase
     // (or any hosted Postgres) when DATABASE_URL is set.
-    const { Pool, types } = await import("pg");
+    const { types } = await import("pg");
     types.setTypeParser(OID_INT8, Number);
     types.setTypeParser(OID_DATE, identity);
     types.setTypeParser(OID_INTERVAL, identity);
-    const { postgresPoolConfig } = await import("./env.server");
-    const pool = new Pool(postgresPoolConfig(databaseUrl!));
+    const { getSharedPgPool } = await import("./pg-pool.server");
+    const pool = getSharedPgPool(databaseUrl!);
     return toSql(async <T>(text: string, params: unknown[]) => {
-      const res = await pool.query(text, params);
-      return res.rows as T[];
+      try {
+        const res = await pool.query(text, params);
+        return res.rows as T[];
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "";
+        if (!/EMAXCONN|max clients|too many clients/i.test(message)) throw err;
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const res = await pool.query(text, params);
+        return res.rows as T[];
+      }
     });
   })().catch((err) => {
     globalRef.__pgSqlPromise__ = undefined;

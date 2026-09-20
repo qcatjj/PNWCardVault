@@ -17,13 +17,13 @@ const BOXES = [
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [featured, latest, slabs, games, stock] = await Promise.all([
-      listProducts({ data: { featured: true, inStock: true, limit: 8 } }),
-      listProducts({ data: { inStock: true, sort: "newest", limit: 16 } }),
-      listProducts({ data: { kind: "slab", inStock: true, limit: 8 } }),
+    const [stock, games] = await Promise.all([
+      listProducts({ data: { inStock: true, sort: "newest", limit: 48 } }),
       getScoreboard(),
-      listProducts({ data: { inStock: true, limit: 48 } }),
     ]);
+    const featured = stock.filter((item) => item.featured).slice(0, 8);
+    const latest = stock.slice(0, 16);
+    const slabs = stock.filter((item) => item.kind === "slab").slice(0, 8);
     return { featured, latest, slabs, games, stock };
   },
   component: Home,

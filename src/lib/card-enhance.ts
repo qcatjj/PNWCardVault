@@ -20,9 +20,16 @@ function enhancePrompt(side: "front" | "back", title?: string) {
 }
 
 function apiError(body: Record<string, unknown>, status: number) {
+  if (status === 402 || status === 429) {
+    return "Photo enhance is out of credits right now. Use the raw photo — the listing still posts.";
+  }
   const err = body.error;
   if (err && typeof err === "object" && "message" in err && typeof (err as { message: unknown }).message === "string") {
-    return (err as { message: string }).message;
+    const message = (err as { message: string }).message;
+    if (/quota|credit|billing|insufficient/i.test(message)) {
+      return "Photo enhance is out of credits right now. Use the raw photo — the listing still posts.";
+    }
+    return message;
   }
   if (typeof body.error === "string") return body.error;
   return `Enhance failed (${status}). Try the raw photo.`;

@@ -19,5 +19,10 @@ export function postgresPoolConfig(connectionString: string) {
   return {
     connectionString,
     ssl: local ? undefined : { rejectUnauthorized: false as const },
+    max: 1,
+    min: 0,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 8_000,
+    allowExitOnIdle: true,
   };
 }
