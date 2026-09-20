@@ -19,7 +19,7 @@ export function AddToCart({ product }: { product: Product }) {
       toast.error(result.reason);
       return;
     }
-    toast.success(product.kind === "break-spot" ? "Spot added to cart." : "Added to cart.");
+    toast.success("Added to cart.");
   }
 
   function onBuy() {
@@ -37,7 +37,7 @@ export function AddToCart({ product }: { product: Product }) {
     );
   }
 
-  const buyLabel = product.kind === "break-spot" ? "Buy this spot" : "Buy now";
+  const buyLabel = "Buy now";
 
   return (
     <div className="flex flex-col gap-3">

@@ -17,7 +17,8 @@ const KIND_ABBR: Record<string, string> = {
   slab: "SLAB",
   auto: "AUTO",
   relic: "RELIC",
-  "break-spot": "SPOT",
+  sealed: "SEALED",
+  "break-spot": "SEALED",
 };
 
 const HOLD: Array<{ key: string; sport: string; name: string; price: string; kind: string; to: "/shop" }> = [

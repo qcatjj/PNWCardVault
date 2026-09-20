@@ -11,7 +11,7 @@ export const KINDS = [
   { id: "slab", label: "Slabs" },
   { id: "auto", label: "Autos" },
   { id: "relic", label: "Relics" },
-  { id: "break-spot", label: "Break spots" },
+  { id: "sealed", label: "Sealed" },
 ] as const;
 
 export type SportId = (typeof SPORTS)[number]["id"];
@@ -139,6 +139,7 @@ export function resolveSport(selected: SportId, ...hints: Array<string | null | 
 }
 
 export function kindLabel(id: string) {
+  if (id === "break-spot") return "Sealed";
   return KINDS.find((k) => k.id === id)?.label ?? id;
 }
 

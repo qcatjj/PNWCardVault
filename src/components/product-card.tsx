@@ -35,7 +35,6 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="flex items-center gap-2">
             <Badge>{kindLabel(product.kind)}</Badge>
             {product.serialNum ? <Badge tone="accent">{product.serialNum}</Badge> : null}
-            {product.kind === "break-spot" && product.qty > 0 ? <Badge tone="live">Spots open</Badge> : null}
           </div>
           <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-snug text-card-foreground">
             {product.title}

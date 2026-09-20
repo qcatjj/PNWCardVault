@@ -118,7 +118,11 @@ export const listProducts = createServerFn({ method: "GET" })
       clauses.push(`p.sport = $${i++}`);
       params.push(filters.sport);
     }
-    if (filters.kind) {
+    if (filters.kind === "sealed") {
+      clauses.push(`(p.kind = $${i} or p.kind = $${i + 1})`);
+      params.push("sealed", "break-spot");
+      i += 2;
+    } else if (filters.kind) {
       clauses.push(`p.kind = $${i++}`);
       params.push(filters.kind);
     }
@@ -240,7 +244,7 @@ export const createListing = createServerFn({ method: "POST" })
       setName: z.string().max(80).optional(),
       year: z.number().int().min(1950).max(2030).optional(),
       sport: z.enum(["basketball", "wnba", "football", "baseball", "nonsport"]),
-      kind: z.enum(["single", "slab", "auto", "relic", "break-spot"]),
+      kind: z.enum(["single", "slab", "auto", "relic", "sealed", "break-spot"]),
       parallel: z.string().max(40).optional(),
       serialNum: z.string().max(20).optional(),
       grade: z.string().max(20).optional(),

@@ -80,6 +80,9 @@ function Home() {
           <Chip to="/shop" search={{ kind: "single" }}>
             Raw
           </Chip>
+          <Chip to="/shop" search={{ kind: "sealed" }}>
+            Sealed
+          </Chip>
           <Chip to="/shop" search={{ kind: "auto" }}>
             Autographs
           </Chip>
@@ -99,7 +102,7 @@ function Home() {
               <span className="live-dot size-2 rounded-full bg-primary" />
               About the shop
             </p>
-            <h2 className="mt-3 text-4xl md:text-5xl">Cards. Breaks. Culture.</h2>
+            <h2 className="mt-3 text-4xl md:text-5xl">Cards. Sealed. Culture.</h2>
             <p className="mt-3 text-sm text-muted-foreground md:text-base">
               PNW Card Hub is a private Pacific Northwest shop. Listings come from the owner desk. No buyer account —
               pay on Stripe and keep the order code as the packing slip.
