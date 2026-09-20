@@ -6,7 +6,7 @@ import { requireOwner } from "@/lib/desk-owner";
 export const DEPICTION_NOTE =
   "This is a depiction of the card. The listing photo was AI-enhanced for shop quality. You receive the physical card described, in the condition noted.";
 
-const MODELS = ["grok-imagine-image-quality", "grok-imagine-image-2.0", "grok-imagine-image"] as const;
+const MODELS = ["grok-imagine-image-2.0", "grok-imagine-image", "grok-imagine-image-quality"] as const;
 
 function enhancePrompt(side: "front" | "back", title?: string) {
   const face = side === "back" ? "back" : "front";
@@ -17,6 +17,15 @@ function enhancePrompt(side: "front" | "back", title?: string) {
     "Keep the exact card. Same player, set, year, number, parallel, logos, colors, wear, and every line of text. Do not redesign it, do not invent a different card, do not add holofoil that is not already there.",
     "Crop out hands, tables, and clutter. Portrait trading-card crop. This is a depiction of the card for the listing, not a replacement of the physical card.",
   ].join(" ");
+}
+
+function apiError(body: Record<string, unknown>, status: number) {
+  const err = body.error;
+  if (err && typeof err === "object" && "message" in err && typeof (err as { message: unknown }).message === "string") {
+    return (err as { message: string }).message;
+  }
+  if (typeof body.error === "string") return body.error;
+  return `Enhance failed (${status}). Try the raw photo.`;
 }
 
 function resultUrl(body: Record<string, unknown>): string | null {
@@ -104,8 +113,15 @@ export const enhanceListingPhoto = createServerFn({ method: "POST" })
         try {
           const result = await requestEdit(apiKey, model, prompt, data.image);
           if (!result.ok) {
-            lastError = `Enhance failed (${result.status}). Try the raw photo.`;
-            if (result.status === 400 || result.status === 404 || result.status === 422) continue;
+            lastError = apiError(result.body, result.status);
+            if (
+              result.status === 400 ||
+              result.status === 403 ||
+              result.status === 404 ||
+              result.status === 422
+            ) {
+              continue;
+            }
             return { ok: false, error: lastError };
           }
           const url = resultUrl(result.body);
