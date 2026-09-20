@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { ProductGrid } from "@/components/product-card";
+import { ScoreCard } from "@/components/score-card";
 import { ShowStack } from "@/components/show-stack";
 import { listProducts } from "@/lib/catalog";
 import type { Product } from "@/lib/catalog-types";
+import { getScoreboard, matchListings } from "@/lib/scores";
 
 const BOXES = [
   { id: "basketball" as const, label: "Basketball" },
@@ -15,22 +17,29 @@ const BOXES = [
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [featured, latest, slabs] = await Promise.all([
+    const [featured, latest, slabs, games, stock] = await Promise.all([
       listProducts({ data: { featured: true, inStock: true, limit: 8 } }),
       listProducts({ data: { inStock: true, sort: "newest", limit: 16 } }),
       listProducts({ data: { kind: "slab", inStock: true, limit: 8 } }),
+      getScoreboard(),
+      listProducts({ data: { inStock: true, limit: 48 } }),
     ]);
-    return { featured, latest, slabs };
+    return { featured, latest, slabs, games, stock };
   },
   component: Home,
 });
 
 function Home() {
-  const { featured, latest, slabs } = Route.useLoaderData();
+  const { featured, latest, slabs, games, stock } = Route.useLoaderData();
   const pool = unique([...featured, ...latest]);
   const hot = (featured.length ? featured : latest).slice(0, 8);
   const under50 = pool.filter((item) => item.priceCents <= 5000).slice(0, 8);
   const shorts = pool.filter((item) => Boolean(item.serialNum)).slice(0, 8);
+  const board = games
+    .filter((game) => game.state !== "pre")
+    .map((game) => ({ game, cards: matchListings(game, stock).slice(0, 4) }))
+    .filter((row) => row.cards.length > 0)
+    .slice(0, 3);
 
   return (
     <main>
@@ -88,6 +97,31 @@ function Home() {
           </Chip>
         </div>
       </section>
+
+      {board.length > 0 ? (
+        <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]">
+                <span className="live-dot size-2 rounded-full bg-primary" />
+                Tonight
+              </p>
+              <h2 className="mt-2 text-3xl md:text-4xl">On the board</h2>
+            </div>
+            <Link to="/scores" className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex">
+              All scores <ArrowRight className="size-4" />
+            </Link>
+          </div>
+          <div className="space-y-8">
+            {board.map(({ game, cards }) => (
+              <div key={game.id} className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-start">
+                <ScoreCard game={game} />
+                <ProductGrid products={cards} />
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <Shelf title="Hot right now" products={hot} />
       <Shelf title="New drops" products={latest.slice(0, 8)} to="/drops" />

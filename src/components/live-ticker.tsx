@@ -3,7 +3,19 @@ import { Link } from "@tanstack/react-router";
 import { getScoreboard, type ScoreGame } from "@/lib/scores";
 
 const HOLD: ScoreGame[] = [
-  { id: "h1", sport: "HUB", away: "PNW", home: "LIVE", awayScore: "", homeScore: "", state: "pre", clock: "Scoreboard warming up" },
+  {
+    id: "h1",
+    sport: "HUB",
+    away: "PNW",
+    home: "LIVE",
+    awayName: "PNW",
+    homeName: "LIVE",
+    awayScore: "",
+    homeScore: "",
+    state: "pre",
+    clock: "Scoreboard warming up",
+    needles: [],
+  },
 ];
 
 export function LiveTicker() {
@@ -40,8 +52,8 @@ export function LiveTicker() {
 }
 
 function TickItem({ game }: { game: ScoreGame }) {
-  return (
-    <Link to="/scores" className="flex h-8 shrink-0 items-center gap-2 border-r border-border px-3 hover:bg-muted">
+  const body = (
+    <>
       <span className="font-mono text-[10px] font-medium tracking-[0.14em] text-accent">{game.sport}</span>
       <span className="font-mono text-[12px] font-semibold tabular-nums text-foreground">
         {game.away}
@@ -51,6 +63,19 @@ function TickItem({ game }: { game: ScoreGame }) {
         {game.home}
       </span>
       <span className="font-mono text-[10px] tracking-[0.08em] text-live">{game.clock}</span>
+    </>
+  );
+  const className = "flex h-8 shrink-0 items-center gap-2 border-r border-border px-3 hover:bg-muted";
+  if (!game.needles.length) {
+    return (
+      <Link to="/scores" className={className}>
+        {body}
+      </Link>
+    );
+  }
+  return (
+    <Link to="/scores/$id" params={{ id: game.id }} className={className}>
+      {body}
     </Link>
   );
 }

@@ -21,6 +21,7 @@ import { Route as CSlugRouteImport } from './routes/c.$slug'
 import { Route as DropSlugRouteImport } from './routes/drop.$slug'
 import { Route as OrderCodeRouteImport } from './routes/order.$code'
 import { Route as OrderStripeRouteImport } from './routes/order.stripe'
+import { Route as ScoresIdRouteImport } from './routes/scores.$id'
 import { Route as VCodeRouteImport } from './routes/v.$code'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -84,6 +85,11 @@ const OrderStripeRoute = OrderStripeRouteImport.update({
   path: '/order/stripe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScoresIdRoute = ScoresIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ScoresRoute,
+} as any)
 const VCodeRoute = VCodeRouteImport.update({
   id: '/v/$code',
   path: '/v/$code',
@@ -102,12 +108,13 @@ export interface FileRoutesByFullPath {
   '/drops': typeof DropsRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
-  '/scores': typeof ScoresRoute
+  '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
+  '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -118,12 +125,13 @@ export interface FileRoutesByTo {
   '/drops': typeof DropsRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
-  '/scores': typeof ScoresRoute
+  '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
+  '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -135,12 +143,13 @@ export interface FileRoutesById {
   '/drops': typeof DropsRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
-  '/scores': typeof ScoresRoute
+  '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
+  '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
+    | '/scores/$id'
     | '/v/$code'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
+    | '/scores/$id'
     | '/v/$code'
     | '/api/auth/$'
   id:
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
+    | '/scores/$id'
     | '/v/$code'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -202,7 +214,7 @@ export interface RootRouteChildren {
   DropsRoute: typeof DropsRoute
   LiveRoute: typeof LiveRoute
   LoginRoute: typeof LoginRoute
-  ScoresRoute: typeof ScoresRoute
+  ScoresRoute: typeof ScoresRouteWithChildren
   ShopRoute: typeof ShopRoute
   CSlugRoute: typeof CSlugRoute
   DropSlugRoute: typeof DropSlugRoute
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrderStripeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/scores/$id': {
+      id: '/scores/$id'
+      path: '/$id'
+      fullPath: '/scores/$id'
+      preLoaderRoute: typeof ScoresIdRouteImport
+      parentRoute: typeof ScoresRoute
+    }
     '/v/$code': {
       id: '/v/$code'
       path: '/v/$code'
@@ -315,6 +334,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ScoresRouteChildren {
+  ScoresIdRoute: typeof ScoresIdRoute
+}
+
+const ScoresRouteChildren: ScoresRouteChildren = {
+  ScoresIdRoute: ScoresIdRoute,
+}
+
+const ScoresRouteWithChildren =
+  ScoresRoute._addFileChildren(ScoresRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CheckoutRoute: CheckoutRoute,
@@ -322,7 +352,7 @@ const rootRouteChildren: RootRouteChildren = {
   DropsRoute: DropsRoute,
   LiveRoute: LiveRoute,
   LoginRoute: LoginRoute,
-  ScoresRoute: ScoresRoute,
+  ScoresRoute: ScoresRouteWithChildren,
   ShopRoute: ShopRoute,
   CSlugRoute: CSlugRoute,
   DropSlugRoute: DropSlugRoute,

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { getScoreboard, type ScoreGame } from "@/lib/scores";
-import { cn } from "@/lib/utils";
+import { ScoreCard } from "@/components/score-card";
+import { getScoreboard } from "@/lib/scores";
 
 export const Route = createFileRoute("/scores")({
   loader: () => getScoreboard(),
@@ -30,7 +30,7 @@ function Scores() {
       </p>
       <h1 className="mt-3 text-4xl md:text-5xl">Scores</h1>
       <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-        Rolling scores for basketball, football, and baseball. Tap a game in the top bar to land here.
+        Tap a game to see if those teams — or tonight’s names — are in the case.
       </p>
 
       {games.length === 0 ? (
@@ -55,38 +55,5 @@ function Scores() {
         </div>
       )}
     </main>
-  );
-}
-
-function ScoreCard({ game }: { game: ScoreGame }) {
-  const live = game.state === "in";
-  return (
-    <article className="rounded-[20px] border border-border bg-foreground/[0.04] p-4">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="font-mono text-[10px] font-semibold tracking-[0.16em] text-muted-foreground">{game.sport}</span>
-        <span
-          className={cn(
-            "font-mono text-[10px] font-semibold tracking-[0.12em]",
-            live ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          {live ? "LIVE · " : ""}
-          {game.clock}
-        </span>
-      </div>
-      <TeamRow abbr={game.away} score={game.awayScore} lead={Number(game.awayScore) > Number(game.homeScore)} />
-      <TeamRow abbr={game.home} score={game.homeScore} lead={Number(game.homeScore) > Number(game.awayScore)} />
-    </article>
-  );
-}
-
-function TeamRow({ abbr, score, lead }: { abbr: string; score: string; lead: boolean }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3 py-1">
-      <span className={cn("font-display text-2xl", lead ? "text-foreground" : "text-muted-foreground")}>{abbr}</span>
-      <span className={cn("font-mono text-2xl tabular-nums", lead ? "text-primary" : "text-foreground")}>
-        {score || "—"}
-      </span>
-    </div>
   );
 }
