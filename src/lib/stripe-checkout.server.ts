@@ -1,13 +1,12 @@
 import { getRequest } from "@tanstack/react-start/server";
 import { env, isWorkspacePreview } from "@/lib/env.server";
 
-export type PaymentMode = "preview-test" | "live" | "pending";
+export type PaymentMode = "preview-test" | "live" | "test" | "pending";
 
 export function paymentMode(): PaymentMode {
   const key = env("STRIPE_SECRET_KEY");
   if (key?.startsWith("sk_live_")) return "live";
-  // Vercel and Grok-published hosts must never fake-charge. Test cards stay in
-  // the in-chat preview only.
+  if (key?.startsWith("sk_test_")) return "test";
   const onVercel = Boolean(env("VERCEL") || env("VERCEL_ENV"));
   if (!onVercel && isWorkspacePreview()) return "preview-test";
   return "pending";
@@ -15,6 +14,10 @@ export function paymentMode(): PaymentMode {
 
 function stripeKey() {
   return env("STRIPE_SECRET_KEY");
+}
+
+function stripeReady(key: string | undefined) {
+  return Boolean(key?.startsWith("sk_live_") || key?.startsWith("sk_test_"));
 }
 
 function publicOrigin() {
@@ -38,8 +41,8 @@ export async function createStripeCheckoutSession(
   cancelPath = "/checkout",
 ) {
   const key = stripeKey();
-  if (!key?.startsWith("sk_live_")) {
-    throw new Error("Stripe is not connected for live charges yet.");
+  if (!stripeReady(key)) {
+    throw new Error("Stripe is not connected yet. Add STRIPE_SECRET_KEY.");
   }
   const origin = publicOrigin();
   if (!origin) throw new Error("Could not start Stripe checkout.");
@@ -87,7 +90,7 @@ type StripeIntent = { id?: string; payment_method?: StripePaymentMethod | string
 
 export async function paidStripeItems(sessionId: string) {
   const key = stripeKey();
-  if (!key?.startsWith("sk_live_")) return null;
+  if (!stripeReady(key) || !key) return null;
   const qs = new URLSearchParams();
   qs.append("expand[]", "payment_intent.payment_method");
   const res = await fetch(

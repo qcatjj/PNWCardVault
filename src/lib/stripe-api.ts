@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-export type PaymentMode = "preview-test" | "live" | "pending";
+export type PaymentMode = "preview-test" | "live" | "test" | "pending";
 
 export const getPaymentMode = createServerFn({ method: "GET" }).handler(async (): Promise<PaymentMode> => {
   const { paymentMode } = await import("./stripe-checkout.server");

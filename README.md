@@ -47,7 +47,7 @@ Optional later:
 
 | Name | Value |
 |---|---|
-| `STRIPE_SECRET_KEY` | Stripe **live** secret key (`sk_live_...`) from [dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys). Checkout stays off until this is set. |
+| `STRIPE_SECRET_KEY` | Stripe **test** key (`sk_test_...`) first, from [dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys) with **Test mode** on. Switch to `sk_live_...` when real charges should go to dad. |
 | `XAI_API_KEY` | Only if you want AI photo enhance / auto-read on listings |
 
 6. Click **Deploy**.
