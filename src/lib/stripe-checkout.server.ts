@@ -5,8 +5,8 @@ export type PaymentMode = "preview-test" | "live" | "test" | "pending";
 
 export function paymentMode(): PaymentMode {
   const key = env("STRIPE_SECRET_KEY");
-  if (key?.startsWith("sk_live_")) return "live";
-  if (key?.startsWith("sk_test_")) return "test";
+  if (key?.startsWith("sk_live_") || key?.startsWith("rk_live_")) return "live";
+  if (key?.startsWith("sk_test_") || key?.startsWith("rk_test_")) return "test";
   const onVercel = Boolean(env("VERCEL") || env("VERCEL_ENV"));
   if (!onVercel && isWorkspacePreview()) return "preview-test";
   return "pending";
@@ -17,7 +17,12 @@ function stripeKey() {
 }
 
 function stripeReady(key: string | undefined) {
-  return Boolean(key?.startsWith("sk_live_") || key?.startsWith("sk_test_"));
+  return Boolean(
+    key?.startsWith("sk_live_") ||
+      key?.startsWith("sk_test_") ||
+      key?.startsWith("rk_live_") ||
+      key?.startsWith("rk_test_"),
+  );
 }
 
 function publicOrigin() {
