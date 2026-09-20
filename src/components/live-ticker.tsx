@@ -64,9 +64,9 @@ export function LiveTicker() {
   const seconds = Math.max(28, loop.length * 2.4);
 
   return (
-    <div className="ticker-track flex h-8 items-stretch border-t border-border bg-background">
-      <p className="flex shrink-0 items-center gap-1.5 bg-destructive px-2.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-destructive-foreground">
-        <span className="live-dot size-1.5 rounded-full bg-destructive-foreground" />
+    <div className="ticker-track flex h-8 items-stretch">
+      <p className="flex shrink-0 items-center gap-1.5 bg-live px-2.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-background">
+        <span className="live-dot size-1.5 rounded-full bg-background" />
         Live
       </p>
       <div className="min-w-0 flex-1 overflow-hidden">
@@ -86,7 +86,7 @@ function TickItem({ item }: { item: Tick }) {
       <span className="font-mono text-[10px] font-medium tracking-[0.14em] text-accent">{item.sport}</span>
       <span className="max-w-40 truncate text-[12px] font-medium text-foreground">{item.name}</span>
       <span className="font-mono text-[12px] tabular-nums text-primary">{item.price}</span>
-      <span className="font-mono text-[10px] tracking-[0.12em] text-muted-foreground">{item.kind}</span>
+      <span className="font-mono text-[10px] tracking-[0.12em] text-live">{item.kind}</span>
     </>
   );
 

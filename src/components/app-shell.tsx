@@ -81,7 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </footer>
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-primary/40 bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
         aria-label="App"
       >
         <div className="grid h-[4.25rem] grid-cols-4">
@@ -130,7 +130,7 @@ function TabLink({
       to={to}
       className={cn(
         "flex flex-col items-center justify-center gap-0.5 text-[11px] font-medium",
-        active ? "text-foreground" : "text-muted-foreground",
+        active ? "text-primary" : "text-muted-foreground",
       )}
     >
       {children}
