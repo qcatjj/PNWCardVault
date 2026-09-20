@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /desk
+Disallow: /login
+Sitemap: https://pnwcardhub.app/sitemap.xml
