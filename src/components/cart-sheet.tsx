@@ -16,12 +16,12 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-background/70" />
-        <Dialog.Content className="fixed inset-x-0 bottom-0 z-50 flex h-[min(92dvh,40rem)] w-full flex-col rounded-t-3xl border-t border-border bg-card shadow-xl outline-none md:inset-y-0 md:right-0 md:left-auto md:h-dvh md:max-w-md md:rounded-none md:border-t-0 md:border-l">
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-background/70 backdrop-blur-sm data-[state=open]:animate-in" />
+        <Dialog.Content className="fixed top-0 right-0 z-50 flex h-dvh w-[min(26rem,94vw)] flex-col border-l border-border bg-card outline-none">
           <div className="flex items-center justify-between border-b border-border px-5 py-4">
-            <Dialog.Title className="font-display text-xl text-card-foreground">Cart</Dialog.Title>
+            <Dialog.Title className="font-display text-2xl text-card-foreground">Your bag</Dialog.Title>
             <Dialog.Close asChild>
-              <button type="button" className="flex size-11 items-center justify-center rounded-md hover:bg-muted" aria-label="Close cart">
+              <button type="button" className="flex size-11 items-center justify-center rounded-xl hover:bg-muted" aria-label="Close cart">
                 <X className="size-5" />
               </button>
             </Dialog.Close>
@@ -30,14 +30,14 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
             {lines.length === 0 ? (
               <div className="flex h-full min-h-56 flex-col items-center justify-center text-center">
                 <ShoppingBag className="size-8 text-muted-foreground" />
-                <p className="mt-3 font-display text-2xl">The box is empty.</p>
-                <p className="mt-1 text-sm text-muted-foreground">Take a listing from the hub.</p>
+                <p className="mt-3 font-display text-2xl">Bag is empty.</p>
+                <p className="mt-1 text-sm text-muted-foreground">Grab a listing from the drop.</p>
               </div>
             ) : (
-              <ul className="space-y-4">
+              <ul className="divide-y divide-border">
                 {lines.map((line) => (
-                  <li key={line.productId} className="flex gap-3">
-                    <div className="w-20 shrink-0 overflow-hidden rounded-md border border-border">
+                  <li key={line.productId} className="flex gap-3 py-4">
+                    <div className="w-14 shrink-0 overflow-hidden rounded-lg border border-border">
                       <ProductMedia
                         product={{
                           title: line.title,
@@ -59,7 +59,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
                       <Link
                         to="/c/$slug"
                         params={{ slug: line.slug }}
-                        className="line-clamp-2 text-sm font-medium text-foreground"
+                        className="line-clamp-2 text-sm font-semibold text-foreground"
                         onClick={() => onOpenChange(false)}
                       >
                         {line.title}
@@ -88,16 +88,16 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
             )}
           </div>
           <div className="border-t border-border p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-            <div className="mb-3 flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="tabular-nums font-medium">{formatPrice(total)}</span>
+            <div className="mb-3 flex items-center justify-between font-display text-xl">
+              <span>Total</span>
+              <span className="tabular-nums">{formatPrice(total)}</span>
             </div>
             {lines.length === 0 ? (
-              <Button className="w-full" disabled>
+              <Button className="w-full rounded-xl" disabled>
                 Checkout
               </Button>
             ) : (
-              <Button asChild className="w-full">
+              <Button asChild className="w-full rounded-xl">
                 <Link to="/checkout" onClick={() => onOpenChange(false)}>
                   Checkout with Stripe
                 </Link>
@@ -116,15 +116,14 @@ export function CartButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="relative flex size-11 items-center justify-center rounded-md hover:bg-muted"
-      aria-label={count ? `Cart, ${count} items` : "Cart"}
+      className="relative flex h-11 items-center gap-2 rounded-xl border border-border bg-foreground/5 px-3 text-sm font-semibold hover:bg-muted"
+      aria-label={count ? `Bag, ${count} items` : "Bag"}
     >
-      <ShoppingBag className="size-5" />
-      {count > 0 ? (
-        <span className="absolute top-1.5 right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground tabular-nums">
-          {count}
-        </span>
-      ) : null}
+      <ShoppingBag className="size-4" />
+      <span className="hidden sm:inline">Bag</span>
+      <span className="inline-grid min-w-[19px] place-items-center rounded-full bg-primary px-1.5 text-[11px] font-bold text-primary-foreground tabular-nums">
+        {count}
+      </span>
     </button>
   );
 }

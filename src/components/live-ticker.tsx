@@ -64,9 +64,9 @@ export function LiveTicker() {
   const seconds = Math.max(28, loop.length * 2.4);
 
   return (
-    <div className="ticker-track flex h-8 items-stretch">
-      <p className="flex shrink-0 items-center gap-1.5 bg-live px-2.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-background">
-        <span className="live-dot size-1.5 rounded-full bg-background" />
+    <div className="ticker-track flex h-8 items-stretch rounded-xl border border-border">
+      <p className="flex shrink-0 items-center gap-1.5 bg-primary px-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-primary-foreground">
+        <span className="live-dot size-1.5 rounded-full bg-primary-foreground" />
         Live
       </p>
       <div className="min-w-0 flex-1 overflow-hidden">

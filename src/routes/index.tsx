@@ -1,165 +1,178 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { BinButton } from "@/components/bin-button";
 import { ProductGrid } from "@/components/product-card";
-import { ProductMedia } from "@/components/product-media";
-import { HubHalo } from "@/components/hub-mark";
+import { ShowStack } from "@/components/show-stack";
 import { listProducts } from "@/lib/catalog";
-import { productMeta, sportLabel } from "@/lib/catalog-types";
-import { formatPrice } from "@/lib/format";
+import type { Product } from "@/lib/catalog-types";
 
 const BOXES = [
-  { id: "basketball" as const, box: "01" },
-  { id: "wnba" as const, box: "02" },
-  { id: "football" as const, box: "03" },
-  { id: "baseball" as const, box: "04" },
-  { id: "nonsport" as const, box: "05" },
+  { id: "basketball" as const, label: "Basketball" },
+  { id: "wnba" as const, label: "Women's hoops" },
+  { id: "football" as const, label: "Football" },
+  { id: "baseball" as const, label: "Baseball" },
+  { id: "nonsport" as const, label: "Non-sport" },
 ];
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [featured, latest] = await Promise.all([
+    const [featured, latest, slabs] = await Promise.all([
       listProducts({ data: { featured: true, inStock: true, limit: 8 } }),
-      listProducts({ data: { inStock: true, sort: "newest", limit: 8 } }),
+      listProducts({ data: { inStock: true, sort: "newest", limit: 16 } }),
+      listProducts({ data: { kind: "slab", inStock: true, limit: 8 } }),
     ]);
-    return { featured, latest };
+    return { featured, latest, slabs };
   },
   component: Home,
 });
 
 function Home() {
-  const { featured, latest } = Route.useLoaderData();
-  const hero = featured[0] ?? latest[0] ?? null;
-  const shelf = (featured.length > 1 ? featured : latest).filter((item) => item.id !== hero?.id).slice(0, 8);
+  const { featured, latest, slabs } = Route.useLoaderData();
+  const pool = unique([...featured, ...latest]);
+  const hot = (featured.length ? featured : latest).slice(0, 8);
+  const under50 = pool.filter((item) => item.priceCents <= 5000).slice(0, 8);
+  const shorts = pool.filter((item) => Boolean(item.serialNum)).slice(0, 8);
 
   return (
     <main>
-      <section className="border-b border-border hub-plate">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-14">
-          <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
-            Pacific Northwest · singles shop
+      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-10 pb-6 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:pt-16">
+        <div className="relative z-10">
+          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-foreground">
+            <span className="live-dot size-2 rounded-full bg-primary" />
+            Cards on the table
           </p>
-          {hero ? (
-            <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-center">
-              <div className="relative mx-auto w-full max-w-[18rem] lg:mx-0">
-                <HubHalo className="pointer-events-none absolute -inset-10 text-border" />
-                <Link
-                  to="/c/$slug"
-                  params={{ slug: hero.slug }}
-                  className="relative block overflow-hidden rounded-2xl bg-card shadow-[var(--shadow-border)]"
-                >
-                  <ProductMedia product={hero} className="aspect-[2.5/3.5]" />
-                </Link>
-              </div>
-              <div>
-                <h1 className="max-w-xl font-display text-4xl text-foreground md:text-6xl">
-                  The hub is open. Cards on the table.
-                </h1>
-                <p className="mt-4 max-w-md text-base text-foreground/85">
-                  A Pacific Northwest shop for singles and slabs. Buy it now with Stripe — ships after checkout, no
-                  stream required.
-                </p>
-                <p className="mt-6 font-display text-2xl">{hero.title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{productMeta(hero)}</p>
-                <p className="mt-3 font-display text-3xl tabular-nums">{formatPrice(hero.priceCents)}</p>
-                <div className="mt-6 flex max-w-md flex-col gap-3 sm:flex-row">
-                  <BinButton product={hero} className="flex-1" />
-                  <Link
-                    to="/shop"
-                    className="inline-flex h-12 flex-1 items-center justify-center rounded-lg border border-border px-5 text-base font-medium hover:bg-muted"
-                  >
-                    Shop the hub
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="mt-6">
-              <h1 className="max-w-xl font-display text-4xl md:text-6xl">The hub is empty.</h1>
-              <p className="mt-4 max-w-md text-base text-foreground/85">
-                Cards show up here as they’re listed. Check back, or open the shop.
-              </p>
-              <div className="mt-6 flex max-w-md flex-col gap-3 sm:flex-row">
-                <Link
-                  to="/shop"
-                  className="inline-flex h-12 items-center justify-center rounded-lg bg-primary px-5 text-base font-medium text-primary-foreground hover:opacity-90"
-                >
-                  Shop the hub
-                </Link>
-                <Link
-                  to="/desk"
-                  className="inline-flex h-12 items-center justify-center rounded-lg border border-border px-5 text-base font-medium hover:bg-muted"
-                >
-                  Owner desk
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {shelf.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <div className="mb-8 flex items-end justify-between gap-4">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">In the hub</p>
-              <h2 className="mt-2 font-display text-3xl">Open boxes</h2>
-            </div>
-            <Link to="/shop" className="hidden items-center gap-1 text-sm text-primary sm:inline-flex">
-              Shop all <ArrowRight className="size-4" />
+          <h1 className="mt-4 max-w-xl text-6xl text-foreground md:text-8xl">
+            Own the
+            <br />
+            <span className="stroke-title">hobby.</span>
+          </h1>
+          <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
+            Pacific Northwest sports-card shop for singles and slabs. Buy now with Stripe — ships after checkout.
+          </p>
+          <div className="mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
+            <Link
+              to="/shop"
+              className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground shadow-[0_10px_32px_color-mix(in_oklab,var(--color-primary)_16%,transparent)]"
+            >
+              Shop cards
+            </Link>
+            <Link
+              to="/drops"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-foreground/5 px-5 text-sm font-bold"
+            >
+              View new drops
             </Link>
           </div>
-          <ProductGrid products={shelf} />
-        </section>
-      ) : null}
-
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="mb-6">
-          <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">By sport</p>
-          <h2 className="mt-2 font-display text-3xl">Boxes by sport</h2>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {BOXES.map((item) => (
-            <Link
-              key={item.id}
-              to="/shop"
-              search={{ sport: item.id }}
-              className="rounded-2xl bg-card px-4 py-5 shadow-[var(--shadow-border)] hover:shadow-[var(--shadow-border-hover)]"
-            >
-              <p className="font-mono text-xs tabular-nums text-muted-foreground">Box {item.box}</p>
-              <p className="mt-2 font-display text-xl">{sportLabel(item.id)}</p>
-            </Link>
+        <ShowStack />
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+          <Chip to="/shop">All</Chip>
+          {BOXES.map((box) => (
+            <Chip key={box.id} to="/shop" search={{ sport: box.id }}>
+              {box.label}
+            </Chip>
           ))}
+          <Chip to="/shop" search={{ kind: "slab" }}>
+            Slabs
+          </Chip>
+          <Chip to="/shop" search={{ kind: "single" }}>
+            Raw
+          </Chip>
+          <Chip to="/shop" search={{ kind: "auto" }}>
+            Autographs
+          </Chip>
         </div>
       </section>
 
-      <section className="border-t border-border hub-plate">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-3">
-          {[
-            {
-              n: "01",
-              t: "Open a box",
-              d: "Filter the shop by sport or set. Every listing has its own buy link.",
-            },
-            {
-              n: "02",
-              t: "Pay on Stripe",
-              d: "Buy one card or the whole cart. Shipping is collected at checkout. Ships after the charge.",
-            },
-            {
-              n: "03",
-              t: "Keep the slip",
-              d: "Stock ticks down. You get an order code as the packing slip.",
-            },
-          ].map((step) => (
-            <div key={step.n}>
-              <p className="font-mono text-xs tabular-nums text-muted-foreground">{step.n}</p>
-              <h3 className="mt-2 font-display text-2xl">{step.t}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{step.d}</p>
-            </div>
-          ))}
+      <Shelf title="Hot right now" products={hot} />
+      <Shelf title="New drops" products={latest.slice(0, 8)} to="/drops" />
+      <Shelf title="Slab vault" products={slabs} to="/shop" search={{ kind: "slab" }} />
+      <Shelf title="Under $50" products={under50} />
+      <Shelf title="1/1 + short prints" products={shorts} />
+
+      <section id="about" className="mx-auto mt-8 mb-10 max-w-6xl px-4 sm:px-6">
+        <div className="overflow-hidden rounded-[26px] border border-border bg-card px-6 py-10 sm:flex sm:items-center sm:justify-between sm:px-10">
+          <div className="max-w-xl">
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]">
+              <span className="live-dot size-2 rounded-full bg-primary" />
+              About the shop
+            </p>
+            <h2 className="mt-3 text-4xl md:text-5xl">Cards. Breaks. Culture.</h2>
+            <p className="mt-3 text-sm text-muted-foreground md:text-base">
+              PNW Card Hub is a private Pacific Northwest shop. Listings come from the owner desk. No buyer account —
+              pay on Stripe and keep the order code as the packing slip.
+            </p>
+          </div>
+          <Link
+            to="/shop"
+            className="mt-6 inline-flex h-12 items-center rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground sm:mt-0"
+          >
+            Shop the case
+          </Link>
         </div>
       </section>
     </main>
+  );
+}
+
+function unique(items: Product[]) {
+  const seen = new Set<number>();
+  return items.filter((item) => {
+    if (seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
+}
+
+function Shelf({
+  title,
+  products,
+  to,
+  search,
+}: {
+  title: string;
+  products: Product[];
+  to?: "/shop" | "/drops";
+  search?: { kind?: string };
+}) {
+  if (products.length === 0) return null;
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <h2 className="text-3xl md:text-4xl">{title}</h2>
+        {to ? (
+          <Link to={to} search={search} className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex">
+            See all <ArrowRight className="size-4" />
+          </Link>
+        ) : (
+          <Link to="/shop" className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex">
+            Shop all <ArrowRight className="size-4" />
+          </Link>
+        )}
+      </div>
+      <ProductGrid products={products} />
+    </section>
+  );
+}
+
+function Chip({
+  to,
+  search,
+  children,
+}: {
+  to: "/shop";
+  search?: { sport?: string; kind?: string };
+  children: string;
+}) {
+  return (
+    <Link
+      to={to}
+      search={search}
+      className="inline-flex h-11 shrink-0 items-center rounded-xl border border-border bg-foreground/5 px-3.5 text-sm font-semibold text-muted-foreground hover:text-foreground"
+    >
+      {children}
+    </Link>
   );
 }

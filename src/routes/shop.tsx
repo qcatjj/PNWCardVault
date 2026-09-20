@@ -32,7 +32,7 @@ function Shop() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
-      <h1 className="font-display text-3xl md:text-4xl">Shop</h1>
+      <h1 className="text-4xl md:text-5xl">Shop</h1>
       <p className="mt-2 max-w-xl text-sm text-muted-foreground">
         Filter a box, open a listing, pay with Stripe.
       </p>
@@ -114,7 +114,7 @@ function FilterChip({
       to={to}
       search={search}
       className={cn(
-        "inline-flex min-h-11 items-center rounded-full border px-3.5 text-sm transition-colors duration-150",
+        "inline-flex min-h-11 shrink-0 items-center rounded-xl border px-3.5 text-sm font-semibold transition-colors duration-150",
         active
           ? "border-primary bg-primary text-primary-foreground"
           : "border-border bg-card text-muted-foreground hover:text-foreground",
