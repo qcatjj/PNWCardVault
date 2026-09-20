@@ -15,6 +15,7 @@ import { Route as DeskRouteImport } from './routes/desk'
 import { Route as DropsRouteImport } from './routes/drops'
 import { Route as LiveRouteImport } from './routes/live'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ScoresRouteImport } from './routes/scores'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
 import { Route as DropSlugRouteImport } from './routes/drop.$slug'
@@ -51,6 +52,11 @@ const LiveRoute = LiveRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScoresRoute = ScoresRouteImport.update({
+  id: '/scores',
+  path: '/scores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopRoute = ShopRouteImport.update({
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/drops': typeof DropsRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
+  '/scores': typeof ScoresRoute
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
   '/drop/$slug': typeof DropSlugRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/drops': typeof DropsRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
+  '/scores': typeof ScoresRoute
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
   '/drop/$slug': typeof DropSlugRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/drops': typeof DropsRoute
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
+  '/scores': typeof ScoresRoute
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
   '/drop/$slug': typeof DropSlugRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/drops'
     | '/live'
     | '/login'
+    | '/scores'
     | '/shop'
     | '/c/$slug'
     | '/drop/$slug'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/drops'
     | '/live'
     | '/login'
+    | '/scores'
     | '/shop'
     | '/c/$slug'
     | '/drop/$slug'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/drops'
     | '/live'
     | '/login'
+    | '/scores'
     | '/shop'
     | '/c/$slug'
     | '/drop/$slug'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   DropsRoute: typeof DropsRoute
   LiveRoute: typeof LiveRoute
   LoginRoute: typeof LoginRoute
+  ScoresRoute: typeof ScoresRoute
   ShopRoute: typeof ShopRoute
   CSlugRoute: typeof CSlugRoute
   DropSlugRoute: typeof DropSlugRoute
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scores': {
+      id: '/scores'
+      path: '/scores'
+      fullPath: '/scores'
+      preLoaderRoute: typeof ScoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop': {
@@ -302,6 +322,7 @@ const rootRouteChildren: RootRouteChildren = {
   DropsRoute: DropsRoute,
   LiveRoute: LiveRoute,
   LoginRoute: LoginRoute,
+  ScoresRoute: ScoresRoute,
   ShopRoute: ShopRoute,
   CSlugRoute: CSlugRoute,
   DropSlugRoute: DropSlugRoute,

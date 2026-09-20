@@ -15,6 +15,7 @@ const NAV = [
   { to: "/shop" as const, label: "Singles", search: { kind: "single" } },
   { to: "/shop" as const, label: "Slabs", search: { kind: "slab" } },
   { to: "/shop" as const, label: "Sealed", search: { kind: "sealed" } },
+  { to: "/scores" as const, label: "Scores" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
