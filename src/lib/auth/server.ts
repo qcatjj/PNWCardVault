@@ -90,6 +90,8 @@ const PRODUCTION_ORIGINS: string[] = Array.from(
     ...toHttpsOrigin(explicitBaseURL),
     ...toHttpsOrigin(env("VERCEL_PROJECT_PRODUCTION_URL")),
     ...toHttpsOrigin(env("VERCEL_URL")),
+    "https://pnwcardhub.app",
+    "https://www.pnwcardhub.app",
     "https://pnw-card-vault-1.vercel.app",
     "https://*.vercel.app",
   ]),
