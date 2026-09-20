@@ -78,10 +78,22 @@ const LOCAL_DEV_ORIGINS: string[] = [
   "http://127.0.0.1:8080",
   "http://[::1]:8080",
 ];
-const PRODUCTION_ORIGINS: string[] = [
-  "https://pnw-card-vault-1.vercel.app",
-  "https://pnw-card-vault-1-*.vercel.app",
-];
+function toHttpsOrigin(raw: string | undefined): string[] {
+  if (!raw) return [];
+  const trimmed = raw.replace(/\/+$/, "");
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return [trimmed];
+  return [`https://${trimmed}`];
+}
+
+const PRODUCTION_ORIGINS: string[] = Array.from(
+  new Set([
+    ...toHttpsOrigin(explicitBaseURL),
+    ...toHttpsOrigin(env("VERCEL_PROJECT_PRODUCTION_URL")),
+    ...toHttpsOrigin(env("VERCEL_URL")),
+    "https://pnw-card-vault-1.vercel.app",
+    "https://*.vercel.app",
+  ]),
+);
 const baseURL = explicitBaseURL ?? {
   allowedHosts: [...previewAllowedHosts, "localhost", "127.0.0.1", "[::1]"],
   protocol: "auto" as const,
