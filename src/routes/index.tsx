@@ -142,12 +142,20 @@ function Home() {
               pay on Stripe and keep the order code as the packing slip.
             </p>
           </div>
-          <Link
-            to="/shop"
-            className="mt-6 inline-flex h-12 items-center rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground sm:mt-0"
-          >
-            Shop the case
-          </Link>
+          <div className="mt-6 flex flex-col gap-3 sm:mt-0 sm:flex-row">
+            <Link
+              to="/shop"
+              className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground"
+            >
+              Shop the case
+            </Link>
+            <Link
+              to="/contact"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-foreground/5 px-5 text-sm font-bold"
+            >
+              Contact us
+            </Link>
+          </div>
         </div>
       </section>
     </main>

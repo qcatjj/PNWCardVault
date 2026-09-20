@@ -21,6 +21,7 @@ import { readCardFromPhoto, type CardIdentity } from "@/lib/card-read";
 import { enhanceListingPhoto } from "@/lib/card-enhance";
 import { getDeskContext, type DeskContext } from "@/lib/desk-owner";
 import { formatPrice } from "@/lib/format";
+import { hideReview, listInbox, SHOP_EMAIL, type ShopMessage, type ShopReview } from "@/lib/contact";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/desk")({
@@ -144,7 +145,7 @@ function DeskLock({ onDone }: { onDone: () => void }) {
 }
 
 function DeskHome() {
-  const [tab, setTab] = useState<"list" | "stock">("list");
+  const [tab, setTab] = useState<"list" | "stock" | "inbox">("list");
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -177,10 +178,104 @@ function DeskHome() {
         >
           Inventory
         </button>
+        <button
+          type="button"
+          onClick={() => setTab("inbox")}
+          className={cn("h-11 flex-1 rounded-md text-sm", tab === "inbox" ? "bg-card text-foreground" : "text-muted-foreground")}
+        >
+          Inbox
+        </button>
       </div>
 
-      {tab === "list" ? <ListForm /> : <InventoryPanel />}
+      {tab === "list" ? <ListForm /> : tab === "stock" ? <InventoryPanel /> : <InboxPanel />}
     </main>
+  );
+}
+
+function InboxPanel() {
+  const [messages, setMessages] = useState<ShopMessage[] | null>(null);
+  const [reviews, setReviews] = useState<ShopReview[]>([]);
+  const [busy, setBusy] = useState<number | null>(null);
+
+  useEffect(() => {
+    void listInbox()
+      .then((next) => {
+        setMessages(next.messages);
+        setReviews(next.reviews);
+      })
+      .catch((err) => {
+        toast.error(err instanceof Error ? err.message : "Could not load inbox.");
+        setMessages([]);
+      });
+  }, []);
+
+  async function hide(id: number) {
+    if (busy) return;
+    setBusy(id);
+    try {
+      await hideReview({ data: { id } });
+      setReviews((current) => current.filter((item) => item.id !== id));
+      toast.success("Review hidden.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not hide that review.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  if (!messages) {
+    return <div className="mt-8 h-40 animate-pulse rounded-xl bg-muted" />;
+  }
+
+  return (
+    <div className="mt-8 space-y-10">
+      <section>
+        <h2 className="mb-1 font-display text-2xl">Questions</h2>
+        <p className="mb-4 text-sm text-muted-foreground">Reply from {SHOP_EMAIL}.</p>
+        {messages.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No questions yet.</p>
+        ) : (
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+            {messages.map((item) => (
+              <li key={item.id} className="space-y-2 px-4 py-4">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-medium">{item.name}</p>
+                    <a href={`mailto:${item.email}?subject=${encodeURIComponent("PNW Card Hub")}`} className="text-xs text-primary">
+                      {item.email}
+                    </a>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{new Date(item.createdAt).toLocaleDateString()}</p>
+                </div>
+                <p className="text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      <section>
+        <h2 className="mb-3 font-display text-2xl">Reviews</h2>
+        {reviews.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No public reviews.</p>
+        ) : (
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+            {reviews.map((item) => (
+              <li key={item.id} className="flex flex-wrap items-start gap-3 px-4 py-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">
+                    {item.name} · {item.rating}/5
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">{item.body}</p>
+                </div>
+                <Button type="button" size="sm" variant="outline" disabled={busy !== null} onClick={() => void hide(item.id)}>
+                  Hide
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
   );
 }
 

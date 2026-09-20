@@ -16,6 +16,7 @@ const NAV = [
   { to: "/shop" as const, label: "Slabs", search: { kind: "slab" } },
   { to: "/shop" as const, label: "Sealed", search: { kind: "sealed" } },
   { to: "/scores" as const, label: "Scores" },
+  { to: "/contact" as const, label: "Contact" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -91,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div className="relative z-10 min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
-      <footer className="relative z-10 hidden border-t border-border md:block">
+      <footer className="relative z-10 border-t border-border pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-0">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-6">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">Pacific Northwest</p>
@@ -100,9 +101,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               Singles and slabs from the case. Ships after checkout.
             </p>
           </div>
-          <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
-            Ships after checkout · Stripe
-          </p>
+          <div className="flex flex-col gap-2 sm:items-end">
+            <Link to="/contact" className="text-sm font-semibold hover:text-primary">
+              Contact & reviews
+            </Link>
+            <a href="mailto:pnwcardhub@gmail.com" className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground">
+              pnwcardhub@gmail.com
+            </a>
+            <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              Ships after checkout · Stripe
+            </p>
+          </div>
         </div>
       </footer>
       <nav
