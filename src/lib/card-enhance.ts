@@ -90,7 +90,12 @@ export const enhanceListingPhoto = createServerFn({ method: "POST" })
     }): Promise<{ ok: true; url: string } | { ok: false; error: string }> => {
       await requireOwner(context.userId);
       const apiKey = process.env.XAI_API_KEY;
-      if (!apiKey) return { ok: false, error: "Photo enhance is unavailable right now." };
+      if (!apiKey) {
+        return {
+          ok: false,
+          error: "Photo enhance needs an xAI API key on Vercel (XAI_API_KEY).",
+        };
+      }
 
       const prompt = enhancePrompt(data.side, data.title);
       let lastError = "Could not enhance that photo.";
