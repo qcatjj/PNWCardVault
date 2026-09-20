@@ -46,9 +46,28 @@ async function main() {
   const pool = new pg.Pool({
     connectionString: databaseUrl,
     max: 1,
+    connectionTimeoutMillis: 15_000,
     ssl: local ? undefined : { rejectUnauthorized: false },
   });
-  const client = await pool.connect();
+  let client;
+  let lastErr;
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    try {
+      client = await pool.connect();
+      lastErr = null;
+      break;
+    } catch (err) {
+      lastErr = err;
+      const message = err instanceof Error ? err.message : String(err);
+      if (!/EMAXCONN|max clients|too many clients|timeout/i.test(message) || attempt === 6) {
+        throw err;
+      }
+      const wait = attempt * 1500;
+      console.warn(`[migrate] database busy (${message}). retry ${attempt}/6 in ${wait}ms`);
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+  }
+  if (!client) throw lastErr;
   try {
     await client.query(
       "CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())",
