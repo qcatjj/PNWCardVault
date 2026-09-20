@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "IBM Plex Serif", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --color-background: #090b0d;
+  --color-foreground: #e6e8eb;
+  --color-card: #11151a;
+  --color-card-foreground: #e6e8eb;
+  --color-muted: #191e24;
+  --color-muted-foreground: #8d949c;
+  --color-primary: #d8dde3;
+  --color-primary-foreground: #090b0d;
+  --color-secondary: #191e24;
+  --color-secondary-foreground: #e6e8eb;
+  --color-accent: #a8b0b8;
+  --color-accent-foreground: #090b0d;
+  --color-destructive: #c45c4a;
+  --color-destructive-foreground: #e6e8eb;
+  --color-border: #2c333c;
+  --color-input: #2c333c;
+  --color-ring: #c9d0d8;
+  --color-live: #8a938c;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius: 8px;
+
+  --shadow-border: 0 0 0 1px color-mix(in oklab, var(--color-foreground) 10%, transparent);
+  --shadow-border-hover: 0 0 0 1px color-mix(in oklab, var(--color-foreground) 18%, transparent);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    background-image: repeating-linear-gradient(
+      180deg,
+      transparent 0,
+      transparent 2px,
+      color-mix(in oklab, var(--color-foreground) 2.4%, transparent) 3px
+    );
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img {
+    outline: 1px solid color-mix(in oklab, var(--color-foreground) 10%, transparent);
+    outline-offset: -1px;
+  }
+
+  .ticker {
+    animation: ticker 28s linear infinite;
+  }
+
+  .live-dot {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-live) 70%, transparent);
+    animation: live-pulse 1.8s ease-out infinite;
+  }
+
+  .vault-plate {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-foreground) 7%, var(--color-card)),
+      var(--color-card)
+    );
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-foreground) 12%, transparent);
+  }
+
+  .vault-well {
+    background: var(--color-muted);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklab, var(--color-foreground) 10%, transparent),
+      inset 0 10px 24px color-mix(in oklab, var(--color-background) 55%, transparent);
+  }
+
+  @keyframes ticker {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes live-pulse {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-live) 55%, transparent);
+    }
+    100% {
+      box-shadow: 0 0 0 8px transparent;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticker,
+    .live-dot {
+      animation: none;
+    }
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
