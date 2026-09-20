@@ -111,9 +111,9 @@ function DeskPage() {
           <div className="mb-5 grid size-11 place-items-center rounded-lg bg-muted text-muted-foreground">
             <Lock className="size-5" />
           </div>
-          <h1 className="font-display text-3xl">Not this login</h1>
+          <h1 className="font-display text-3xl">Staff only</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            This desk only opens for the owner email. Sign in with that inbox, or pick a password the first time.
+            This login can’t open the desk. Sign out and try again.
           </p>
           <div className="mt-6">
             <DeskAuth onDone={load} />
@@ -133,10 +133,8 @@ function DeskLock({ onDone }: { onDone: () => void }) {
         <div className="mb-5 grid size-11 place-items-center rounded-lg bg-muted text-muted-foreground">
           <Lock className="size-5" />
         </div>
-        <h1 className="font-display text-3xl">Open the desk</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Only you list cards — locked to your owner email. The shop stays public. On iPhone, use email.
-        </p>
+        <h1 className="font-display text-3xl">Desk</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Staff only. The shop stays public.</p>
         <div className="mt-6">
           <DeskAuth onDone={onDone} />
         </div>

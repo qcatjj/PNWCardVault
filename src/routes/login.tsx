@@ -12,9 +12,9 @@ function Login() {
         <div className="mb-5 grid size-11 place-items-center rounded-lg bg-muted text-muted-foreground">
           <Lock className="size-5" />
         </div>
-        <h1 className="font-display text-3xl">Owner sign-in</h1>
+        <h1 className="font-display text-3xl">Desk</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          The shop stays public. This desk only opens for the owner email. On iPhone, use email — Google and X often never come back.
+          Staff only. Enter the PIN, then sign in. The shop stays public.
         </p>
         {authEnabled ? (
           <div className="mt-6">
