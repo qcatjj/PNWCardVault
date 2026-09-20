@@ -267,7 +267,7 @@ function InventoryPanel() {
       <section>
         <h2 className="mb-3 font-display text-2xl">Orders</h2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Vault codes only — no buyer names stored here. Shipping details stay in Stripe.
+          Order codes only — no buyer names stored here. Shipping details stay in Stripe.
         </p>
         {orders.length === 0 ? (
           <p className="text-sm text-muted-foreground">No orders yet.</p>

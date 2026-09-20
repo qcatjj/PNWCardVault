@@ -87,7 +87,7 @@ export function ListingMissing() {
   return (
     <main className="mx-auto max-w-xl px-4 py-24 text-center">
       <h1 className="font-display text-3xl">That listing walked.</h1>
-      <p className="mt-2 text-sm text-muted-foreground">The buy link does not match anything in the vault.</p>
+      <p className="mt-2 text-sm text-muted-foreground">The buy link does not match anything in the hub.</p>
       <Link to="/shop" className="mt-6 inline-block text-sm text-primary">
         Back to the shop
       </Link>

@@ -32,7 +32,7 @@ function Shop() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">The vault</p>
+      <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">The hub</p>
       <h1 className="mt-2 font-display text-4xl">Open boxes</h1>
       <p className="mt-3 max-w-xl text-sm text-muted-foreground">
         Every card has its own buy link. Filter a box, open a listing, pay with Stripe. Ships after checkout.

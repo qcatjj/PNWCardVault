@@ -31,7 +31,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
               <div className="flex h-full min-h-56 flex-col items-center justify-center text-center">
                 <ShoppingBag className="size-8 text-muted-foreground" />
                 <p className="mt-3 font-display text-2xl">The box is empty.</p>
-                <p className="mt-1 text-sm text-muted-foreground">Take a listing from the vault.</p>
+                <p className="mt-1 text-sm text-muted-foreground">Take a listing from the hub.</p>
               </div>
             ) : (
               <ul className="space-y-4">

@@ -21,7 +21,7 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="line-clamp-2 min-h-10 text-sm font-medium leading-snug text-card-foreground">
           {product.title}
         </h3>
-        <p className="truncate text-xs text-muted-foreground">{productMeta(product) || "Vault listing"}</p>
+        <p className="truncate text-xs text-muted-foreground">{productMeta(product) || "Hub listing"}</p>
         <div className="flex items-baseline gap-2">
           <span className="tabular-nums text-base font-medium text-foreground">
             {formatPrice(product.priceCents)}

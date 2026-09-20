@@ -26,7 +26,7 @@ export function CardFace({
       <div className="absolute inset-[12%] flex flex-col justify-between rounded-sm bg-card p-3">
         <div className="flex items-start justify-between gap-2">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Vault
+            Hub
           </p>
           <p className="text-xs tabular-nums text-muted-foreground">{product.year ?? "—"}</p>
         </div>

@@ -30,7 +30,7 @@ export type CardMatch = {
   imageKind: "card" | "player" | null;
 };
 
-const UA = "PNWCardVault/1.0 (personal sports-card shop; catalog lookup)";
+const UA = "PNWCardHub/1.0 (personal sports-card shop; catalog lookup)";
 const CARD_HOST =
   /ebayimg|tcdb|comc|beckett|goldin|pwcc|fanatics|psacard|sportscardspro|pricecharting|collectors\.com|alt\.xyz|cardladder|pokemontcg|scryfall|tcgdex|sportlots|130point|heritage|panini|topps\.com/i;
 const SKIP_PHOTO =

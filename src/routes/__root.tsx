@@ -7,7 +7,7 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { AuthProvider } from "@/lib/auth/provider";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "PNWCardVault";
+const APP_NAME = "PNW Card Hub";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -15,10 +15,10 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: APP_NAME },
-      { name: "theme-color", content: "#090b0d" },
+      { name: "theme-color", content: "#0a0d0b" },
       {
         name: "description",
-        content: "Pacific Northwest card vault. Singles and slabs sold through Stripe.",
+        content: "Pacific Northwest card hub. Singles and slabs sold through Stripe.",
       },
     ],
     links: [

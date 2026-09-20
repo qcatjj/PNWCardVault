@@ -5,24 +5,24 @@
   --font-display: "IBM Plex Serif", ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  --color-background: #090b0d;
-  --color-foreground: #e6e8eb;
-  --color-card: #11151a;
-  --color-card-foreground: #e6e8eb;
-  --color-muted: #191e24;
-  --color-muted-foreground: #8d949c;
-  --color-primary: #d8dde3;
-  --color-primary-foreground: #090b0d;
-  --color-secondary: #191e24;
-  --color-secondary-foreground: #e6e8eb;
-  --color-accent: #a8b0b8;
-  --color-accent-foreground: #090b0d;
+  --color-background: #0a0d0b;
+  --color-foreground: #e6ebe6;
+  --color-card: #111614;
+  --color-card-foreground: #e6ebe6;
+  --color-muted: #181e1a;
+  --color-muted-foreground: #8d978f;
+  --color-primary: #dce4dc;
+  --color-primary-foreground: #0a0d0b;
+  --color-secondary: #181e1a;
+  --color-secondary-foreground: #e6ebe6;
+  --color-accent: #8fa08c;
+  --color-accent-foreground: #0a0d0b;
   --color-destructive: #c45c4a;
-  --color-destructive-foreground: #e6e8eb;
-  --color-border: #2c333c;
-  --color-input: #2c333c;
-  --color-ring: #c9d0d8;
-  --color-live: #8a938c;
+  --color-destructive-foreground: #e6ebe6;
+  --color-border: #2a332c;
+  --color-input: #2a332c;
+  --color-ring: #c9d4c9;
+  --color-live: #7d9a7a;
 
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -91,7 +91,7 @@
     animation: live-pulse 1.8s ease-out infinite;
   }
 
-  .vault-plate {
+  .hub-plate {
     background: linear-gradient(
       180deg,
       color-mix(in oklab, var(--color-foreground) 7%, var(--color-card)),
@@ -100,7 +100,7 @@
     box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-foreground) 12%, transparent);
   }
 
-  .vault-well {
+  .hub-well {
     background: var(--color-muted);
     box-shadow:
       inset 0 0 0 1px color-mix(in oklab, var(--color-foreground) 10%, transparent),

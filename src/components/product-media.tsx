@@ -34,7 +34,7 @@ export function ProductMedia({
   const sold = product.qty <= 0;
 
   return (
-    <div className={cn("relative overflow-hidden vault-well", className)}>
+    <div className={cn("relative overflow-hidden hub-well", className)}>
       {src ? (
         <img src={src} alt={product.title} sizes={sizes} className="h-full w-full object-cover" />
       ) : (

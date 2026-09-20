@@ -71,7 +71,7 @@ export const useCart = create<CartState>()(
       remove: (productId) => set((state) => ({ lines: state.lines.filter((l) => l.productId !== productId) })),
       clear: () => set({ lines: [] }),
     }),
-    { name: "pnw-card-vault-cart" },
+    { name: "pnw-card-hub-cart" },
   ),
 );
 

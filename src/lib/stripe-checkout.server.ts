@@ -62,8 +62,8 @@ export async function createStripeCheckoutSession(
   params.set("success_url", `${origin}/order/stripe?session_id={CHECKOUT_SESSION_ID}`);
   params.set("cancel_url", `${origin}${cancel}`);
   params.set("submit_type", "pay");
-  params.set("payment_intent_data[description]", "PNW Card Vault");
-  params.set("payment_intent_data[statement_descriptor]", "PNW CARD VAULT");
+  params.set("payment_intent_data[description]", "PNW Card Hub");
+  params.set("payment_intent_data[statement_descriptor]", "PNW CARD HUB");
   params.set(
     "metadata[items]",
     JSON.stringify(items.map((item) => ({ productId: item.productId, qty: item.qty }))),

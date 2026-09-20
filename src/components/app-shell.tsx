@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Lock, Search } from "lucide-react";
 import { type FormEvent, type ReactNode, useState } from "react";
 import { CartButton, CartSheet } from "@/components/cart-sheet";
-import { VaultMark } from "@/components/vault-mark";
+import { HubMark } from "@/components/hub-mark";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -21,13 +21,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-dvh min-w-0 w-full flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border vault-plate">
+      <header className="sticky top-0 z-40 border-b border-border hub-plate">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <VaultMark className="size-9" />
+            <HubMark className="size-9" />
             <span className="flex flex-col leading-none">
               <span className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">PNW Card</span>
-              <span className="font-display text-xl tracking-tight">Vault</span>
+              <span className="font-display text-xl tracking-tight">Hub</span>
             </span>
           </Link>
           <nav className="ml-4 hidden items-center gap-1 md:flex">
@@ -89,11 +89,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
       </header>
       <div className="min-w-0 flex-1">{children}</div>
-      <footer className="border-t border-border vault-plate">
+      <footer className="border-t border-border hub-plate">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-6">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">Private deposit</p>
-            <p className="mt-2 font-display text-2xl">PNW Card Vault</p>
+            <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">Pacific Northwest</p>
+            <p className="mt-2 font-display text-2xl">PNW Card Hub</p>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
               Singles and slabs listed from the case. Ships after checkout.
             </p>

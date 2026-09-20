@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { BinButton } from "@/components/bin-button";
 import { ProductGrid } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
-import { VaultHalo } from "@/components/vault-mark";
+import { HubHalo } from "@/components/hub-mark";
 import { listProducts } from "@/lib/catalog";
 import { productMeta, sportLabel } from "@/lib/catalog-types";
 import { formatPrice } from "@/lib/format";
@@ -34,15 +34,15 @@ function Home() {
 
   return (
     <main>
-      <section className="border-b border-border vault-plate">
+      <section className="border-b border-border hub-plate">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-14">
           <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
-            Private vault · Pacific Northwest
+            Pacific Northwest · singles shop
           </p>
           {hero ? (
             <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-center">
               <div className="relative mx-auto w-full max-w-[18rem] lg:mx-0">
-                <VaultHalo className="pointer-events-none absolute -inset-10 text-border" />
+                <HubHalo className="pointer-events-none absolute -inset-10 text-border" />
                 <Link
                   to="/c/$slug"
                   params={{ slug: hero.slug }}
@@ -53,7 +53,7 @@ function Home() {
               </div>
               <div>
                 <h1 className="max-w-xl font-display text-4xl text-foreground md:text-6xl">
-                  The door is open. Cards under lock.
+                  The hub is open. Cards on the table.
                 </h1>
                 <p className="mt-4 max-w-md text-base text-foreground/85">
                   A Pacific Northwest shop for singles and slabs. Buy it now with Stripe — ships after checkout, no
@@ -68,14 +68,14 @@ function Home() {
                     to="/shop"
                     className="inline-flex h-12 flex-1 items-center justify-center rounded-lg border border-border px-5 text-base font-medium hover:bg-muted"
                   >
-                    Shop the vault
+                    Shop the hub
                   </Link>
                 </div>
               </div>
             </div>
           ) : (
             <div className="mt-6">
-              <h1 className="max-w-xl font-display text-4xl md:text-6xl">The vault is empty.</h1>
+              <h1 className="max-w-xl font-display text-4xl md:text-6xl">The hub is empty.</h1>
               <p className="mt-4 max-w-md text-base text-foreground/85">
                 Cards show up here as they’re listed. Check back, or open the shop.
               </p>
@@ -84,7 +84,7 @@ function Home() {
                   to="/shop"
                   className="inline-flex h-12 items-center justify-center rounded-lg bg-primary px-5 text-base font-medium text-primary-foreground hover:opacity-90"
                 >
-                  Shop the vault
+                  Shop the hub
                 </Link>
                 <Link
                   to="/desk"
@@ -102,7 +102,7 @@ function Home() {
         <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">In the vault</p>
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">In the hub</p>
               <h2 className="mt-2 font-display text-3xl">Open boxes</h2>
             </div>
             <Link to="/shop" className="hidden items-center gap-1 text-sm text-primary sm:inline-flex">
@@ -115,7 +115,7 @@ function Home() {
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mb-6">
-          <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">Safe deposit</p>
+          <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">By sport</p>
           <h2 className="mt-2 font-display text-3xl">Boxes by sport</h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -133,13 +133,13 @@ function Home() {
         </div>
       </section>
 
-      <section className="border-t border-border vault-plate">
+      <section className="border-t border-border hub-plate">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-3">
           {[
             {
               n: "01",
               t: "Open a box",
-              d: "Filter the vault by sport or set. Every listing has its own buy link.",
+              d: "Filter the shop by sport or set. Every listing has its own buy link.",
             },
             {
               n: "02",
@@ -149,7 +149,7 @@ function Home() {
             {
               n: "03",
               t: "Keep the slip",
-              d: "Stock ticks down. You get a vault code as the packing slip.",
+              d: "Stock ticks down. You get an order code as the packing slip.",
             },
           ].map((step) => (
             <div key={step.n}>

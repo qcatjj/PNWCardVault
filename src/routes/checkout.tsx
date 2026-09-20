@@ -184,7 +184,7 @@ function CheckoutPage() {
       <main className="mx-auto max-w-xl px-4 py-24 text-center">
         <h1 className="font-display text-3xl">That listing walked.</h1>
         <Link to="/shop" className="mt-6 inline-block text-sm text-primary">
-          Shop the vault
+          Shop the hub
         </Link>
       </main>
     );
@@ -208,7 +208,7 @@ function CheckoutPage() {
         <h1 className="font-display text-3xl">Nothing to check out.</h1>
         <p className="mt-2 text-sm text-muted-foreground">Add a listing, then come back.</p>
         <Link to="/shop" className="mt-6 inline-block text-sm text-primary">
-          Shop the vault
+          Shop the hub
         </Link>
       </main>
     );
@@ -352,8 +352,8 @@ function PendingPay() {
   return (
     <>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        The shop is live. Card charges wait on the owner’s Stripe account so the money lands with him — not in a
-        test vault.
+        The shop is live. Card charges wait on the owner’s Stripe account so the money lands there — not in a
+        test shop.
       </p>
       <Button type="button" className="mt-8 w-full" size="lg" disabled>
         <Lock className="size-4" />

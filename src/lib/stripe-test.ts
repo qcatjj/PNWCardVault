@@ -48,7 +48,7 @@ export const TEST_CARD = {
   expYear: "34",
   cvc: "123",
   zip: "98901",
-  email: "buyer@pnwcardvault.test",
+  email: "buyer@pnwcardhub.test",
 } as const;
 
 export function brandLabel(brand: string) {
@@ -146,7 +146,7 @@ export function tokenizeCard(
   if (!token) {
     return {
       ok: false,
-      error: "This vault is in Stripe test mode. Use card 4242 4242 4242 4242.",
+      error: "This shop is in Stripe test mode. Use card 4242 4242 4242 4242.",
     };
   }
   const row = TOKENS[token];
@@ -156,7 +156,7 @@ export function tokenizeCard(
 export function chargeTestToken(token: string): { brand: CardBrand; last4: string } {
   const row = TOKENS[token];
   if (!row) {
-    throw new Error("This vault is in Stripe test mode. Use card 4242 4242 4242 4242.");
+    throw new Error("This shop is in Stripe test mode. Use card 4242 4242 4242 4242.");
   }
   if (row.outcome !== "succeed") {
     throw new Error(OUTCOME_MESSAGE[row.outcome]);

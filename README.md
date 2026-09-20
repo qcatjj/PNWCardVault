@@ -1,4 +1,4 @@
-# PNW Card Vault
+# PNW Card Hub
 
 Pacific Northwest sports-card shop. Public shop for buyers. Owner desk is the only place listings get posted.
 
