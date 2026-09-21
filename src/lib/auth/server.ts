@@ -155,11 +155,20 @@ export const auth = betterAuth({
       requireLocalEmailVerified: false,
     },
   },
-  session: { cookieCache: { enabled: true, maxAge: 300 } },
+  session: {
+    expiresIn: 60 * 60 * 24 * 90,
+    updateAge: 60 * 60 * 24,
+    cookieCache: { enabled: true, maxAge: 300 },
+  },
   ...(emailAndPasswordEnabled ? { emailAndPassword: { enabled: true } } : {}),
   advanced: {
     useSecureCookies: false,
-    defaultCookieAttributes: { secure: true, sameSite: "lax", path: "/" },
+    defaultCookieAttributes: {
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 90,
+    },
     cookies: {
       session_token: { name: SESSION_TOKEN_COOKIE },
       session_data: { name: "__Host-grok-auth.session_data" },

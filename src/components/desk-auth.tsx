@@ -5,37 +5,15 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GROK_PROVIDERS, authClient, signIn } from "@/lib/auth/client";
+import { GROK_PROVIDERS, authClient, persistSessionToken, signIn } from "@/lib/auth/client";
 import { checkDeskEmail, checkDeskPin } from "@/lib/desk-gate";
+import { isDeskTrusted, pinUnlocked, rememberDeskDevice, rememberPinUnlock, rememberedDeskEmail } from "@/lib/desk-device";
 import { cn } from "@/lib/utils";
-
-const PREVIEW_BEARER_KEY = "grok-auth.bearer-token";
-const PIN_UNLOCK_KEY = "pnw-desk-pin-ok";
 
 function keepPreviewSession(result: { data?: { token?: string | null } | null } | null | undefined) {
   const token = result?.data?.token;
   if (typeof token !== "string" || !token) return;
-  try {
-    window.sessionStorage.setItem(PREVIEW_BEARER_KEY, token);
-  } catch {
-    /* storage blocked */
-  }
-}
-
-function pinUnlocked() {
-  try {
-    return window.sessionStorage.getItem(PIN_UNLOCK_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function rememberPinUnlock() {
-  try {
-    window.sessionStorage.setItem(PIN_UNLOCK_KEY, "1");
-  } catch {
-    /* storage blocked — PIN still works this visit */
-  }
+  persistSessionToken(token);
 }
 
 const PAD = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"] as const;
@@ -138,6 +116,10 @@ function DeskSignIn({ onDone }: { onDone?: () => void }) {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    if (isDeskTrusted()) setEmail(rememberedDeskEmail());
+  }, []);
+
   async function finish() {
     try {
       await authClient.getSession();
@@ -166,6 +148,7 @@ function DeskSignIn({ onDone }: { onDone?: () => void }) {
       });
       if (!signedIn.error) {
         keepPreviewSession(signedIn);
+        rememberDeskDevice(trimmed);
         await finish();
         return;
       }
@@ -183,6 +166,7 @@ function DeskSignIn({ onDone }: { onDone?: () => void }) {
         return;
       }
       keepPreviewSession(created);
+      rememberDeskDevice(trimmed);
       await finish();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not open the desk.");

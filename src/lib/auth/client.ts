@@ -51,7 +51,7 @@ const BEARER_KEY = "grok-auth.bearer-token";
 export function getBearerToken(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    return window.sessionStorage.getItem(BEARER_KEY);
+    return window.localStorage.getItem(BEARER_KEY) || window.sessionStorage.getItem(BEARER_KEY);
   } catch {
     return null;
   }
@@ -60,11 +60,20 @@ export function getBearerToken(): string | null {
 function setBearerToken(token: string | null): void {
   if (typeof window === "undefined") return;
   try {
-    if (token) window.sessionStorage.setItem(BEARER_KEY, token);
-    else window.sessionStorage.removeItem(BEARER_KEY);
+    if (token) {
+      window.localStorage.setItem(BEARER_KEY, token);
+      window.sessionStorage.setItem(BEARER_KEY, token);
+    } else {
+      window.localStorage.removeItem(BEARER_KEY);
+      window.sessionStorage.removeItem(BEARER_KEY);
+    }
   } catch {
     /* storage unavailable — ignore */
   }
+}
+
+export function persistSessionToken(token: string) {
+  setBearerToken(token);
 }
 
 /**
