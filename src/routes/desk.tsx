@@ -14,7 +14,7 @@ import { DeskAuth } from "@/components/desk-auth";
 import { UserButton } from "@/lib/auth/gates";
 import { authEnabled } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
-import { createListing, deleteListing, getInventory, setListingQty, type Inventory } from "@/lib/catalog";
+import { createListing, deleteListing, getInventory, setListingQty, updateListing, type Inventory } from "@/lib/catalog";
 import { KINDS, productName, resolveSport, SPORTS, type Product } from "@/lib/catalog-types";
 import type { CardMatch } from "@/lib/card-images";
 import { readCardFromPhoto, type CardIdentity } from "@/lib/card-read";
@@ -284,6 +284,7 @@ function InventoryPanel() {
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [busy, setBusy] = useState<number | null>(null);
   const [confirmId, setConfirmId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   async function refresh() {
     const next = await getInventory();
@@ -346,7 +347,8 @@ function InventoryPanel() {
         ) : (
           <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
             {products.map((item) => (
-              <li key={item.id} className="flex flex-wrap items-center gap-3 px-3 py-3">
+              <li key={item.id} className="space-y-3 px-3 py-3">
+                <div className="flex flex-wrap items-center gap-3">
                 <div className="w-10 overflow-hidden rounded-sm border border-border">
                   <ProductMedia product={item} className="aspect-[2.5/3.5]" />
                 </div>
@@ -361,6 +363,15 @@ function InventoryPanel() {
                 </div>
                 {item.qty <= 0 ? <Badge tone="sold">Sold out</Badge> : <Badge>{item.qty} left</Badge>}
                 <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={editingId === item.id ? "secondary" : "outline"}
+                    disabled={busy !== null}
+                    onClick={() => setEditingId((id) => (id === item.id ? null : item.id))}
+                  >
+                    {editingId === item.id ? "Close" : "Edit"}
+                  </Button>
                   {item.qty > 0 ? (
                     <Button type="button" size="sm" variant="outline" disabled={busy !== null} onClick={() => void setQty(item, 0)}>
                       Sold out
@@ -380,6 +391,17 @@ function InventoryPanel() {
                     {confirmId === item.id ? "Remove?" : "Delete"}
                   </Button>
                 </div>
+                </div>
+                {editingId === item.id ? (
+                  <EditCardForm
+                    product={item}
+                    onCancel={() => setEditingId(null)}
+                    onSaved={async () => {
+                      setEditingId(null);
+                      await refresh();
+                    }}
+                  />
+                ) : null}
               </li>
             ))}
           </ul>
@@ -722,6 +744,210 @@ function ListForm() {
           </div>
         </section>
       </aside>
+    </form>
+  );
+}
+
+function asSport(id: string): (typeof SPORTS)[number]["id"] {
+  return SPORTS.some((item) => item.id === id) ? (id as (typeof SPORTS)[number]["id"]) : "basketball";
+}
+
+function asKind(id: string): (typeof KINDS)[number]["id"] | "break-spot" {
+  if (id === "break-spot") return "break-spot";
+  return KINDS.some((item) => item.id === id) ? (id as (typeof KINDS)[number]["id"]) : "single";
+}
+
+function EditCardForm({
+  product,
+  onCancel,
+  onSaved,
+}: {
+  product: Product;
+  onCancel: () => void;
+  onSaved: () => Promise<void>;
+}) {
+  const [pending, setPending] = useState(false);
+  const [title, setTitle] = useState(product.title);
+  const [player, setPlayer] = useState(product.player ?? "");
+  const [setName, setSetName] = useState(product.setName ?? "");
+  const [year, setYear] = useState(product.year ? String(product.year) : "");
+  const [sport, setSport] = useState<(typeof SPORTS)[number]["id"]>(asSport(product.sport));
+  const [kind, setKind] = useState<(typeof KINDS)[number]["id"] | "break-spot">(asKind(product.kind));
+  const [parallel, setParallel] = useState(product.parallel ?? "");
+  const [serialNum, setSerialNum] = useState(product.serialNum ?? "");
+  const [grade, setGrade] = useState(product.grade ?? "");
+  const [price, setPrice] = useState((product.priceCents / 100).toFixed(2).replace(/\.00$/, ""));
+  const [qty, setQty] = useState(String(product.qty));
+  const [description, setDescription] = useState(product.description ?? "");
+  const [featured, setFeatured] = useState(product.featured);
+  const [front, setFront] = useState<string | null>(product.imageUrl);
+  const [back, setBack] = useState<string | null>(product.imageUrlBack ?? null);
+  const [photoMode, setPhotoMode] = useState<PhotoMode>(product.imageDepiction ? "enhanced" : "raw");
+  const [enhancingFront, setEnhancingFront] = useState(false);
+  const [enhancingBack, setEnhancingBack] = useState(false);
+
+  async function enhanceSide(side: "front" | "back", source: string) {
+    const setBusy = side === "front" ? setEnhancingFront : setEnhancingBack;
+    setBusy(true);
+    try {
+      const result = await enhanceListingPhoto({ data: { image: source, side, title: title || product.title } });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
+      }
+      if (side === "front") setFront(result.url);
+      else setBack(result.url);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not enhance that photo.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function changePhotoMode(next: PhotoMode) {
+    setPhotoMode(next);
+    if (next !== "enhanced") return;
+    if (front) void enhanceSide("front", front);
+    if (back) void enhanceSide("back", back);
+  }
+
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    const listingTitle = title.trim() || player.trim();
+    const priceCents = Math.round(Number(price) * 100);
+    const nextQty = Number(qty);
+    if (listingTitle.length < 3) {
+      toast.error("Add a title.");
+      return;
+    }
+    if (!Number.isFinite(priceCents) || priceCents < 100) {
+      toast.error("Set a price.");
+      return;
+    }
+    setPending(true);
+    try {
+      await updateListing({
+        data: {
+          productId: product.id,
+          title: listingTitle,
+          player: player || undefined,
+          setName: setName || undefined,
+          year: year.trim() ? Number(year) : undefined,
+          sport: resolveSport(sport, listingTitle, player, setName, parallel),
+          kind,
+          parallel: parallel || undefined,
+          serialNum: serialNum || undefined,
+          grade: grade || undefined,
+          priceCents,
+          qty: Number.isFinite(nextQty) ? Math.max(0, Math.min(99, nextQty)) : product.qty,
+          description: description || undefined,
+          featured,
+          imageUrl: front || undefined,
+          imageUrlBack: back,
+          imageDepiction: photoMode === "enhanced",
+        },
+      });
+      toast.success("Listing updated.");
+      await onSaved();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save those edits.");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-border bg-muted/40 p-3 sm:p-4">
+      <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Edit listing</p>
+      <ListingShots
+        front={front}
+        back={back}
+        mode={photoMode}
+        onModeChange={changePhotoMode}
+        enhancingFront={enhancingFront}
+        enhancingBack={enhancingBack}
+        onFront={setFront}
+        onBack={setBack}
+      />
+      <Field label="Title" htmlFor={`edit-title-${product.id}`}>
+        <Input id={`edit-title-${product.id}`} value={title} onChange={(e) => setTitle(e.target.value)} />
+      </Field>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Player" htmlFor={`edit-player-${product.id}`}>
+          <Input id={`edit-player-${product.id}`} value={player} onChange={(e) => setPlayer(e.target.value)} />
+        </Field>
+        <Field label="Set" htmlFor={`edit-set-${product.id}`}>
+          <Input id={`edit-set-${product.id}`} value={setName} onChange={(e) => setSetName(e.target.value)} />
+        </Field>
+      </div>
+      <Field label="Notes" htmlFor={`edit-desc-${product.id}`}>
+        <Textarea id={`edit-desc-${product.id}`} rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+      </Field>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Price (USD)" htmlFor={`edit-price-${product.id}`}>
+          <Input id={`edit-price-${product.id}`} inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} />
+        </Field>
+        <Field label="Qty" htmlFor={`edit-qty-${product.id}`}>
+          <Input id={`edit-qty-${product.id}`} inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)} />
+        </Field>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Sport" htmlFor={`edit-sport-${product.id}`}>
+          <select
+            id={`edit-sport-${product.id}`}
+            value={sport}
+            onChange={(e) => setSport(e.target.value as (typeof SPORTS)[number]["id"])}
+            className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            {SPORTS.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Kind" htmlFor={`edit-kind-${product.id}`}>
+          <select
+            id={`edit-kind-${product.id}`}
+            value={kind}
+            onChange={(e) => setKind(e.target.value as (typeof KINDS)[number]["id"])}
+            className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            {KINDS.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+            {kind === "break-spot" ? <option value="break-spot">Break spot</option> : null}
+          </select>
+        </Field>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Field label="Year" htmlFor={`edit-year-${product.id}`}>
+          <Input id={`edit-year-${product.id}`} inputMode="numeric" value={year} onChange={(e) => setYear(e.target.value)} />
+        </Field>
+        <Field label="Parallel" htmlFor={`edit-par-${product.id}`}>
+          <Input id={`edit-par-${product.id}`} value={parallel} onChange={(e) => setParallel(e.target.value)} />
+        </Field>
+        <Field label="Grade" htmlFor={`edit-grade-${product.id}`}>
+          <Input id={`edit-grade-${product.id}`} value={grade} onChange={(e) => setGrade(e.target.value)} />
+        </Field>
+      </div>
+      <Field label="Serial" htmlFor={`edit-serial-${product.id}`}>
+        <Input id={`edit-serial-${product.id}`} value={serialNum} onChange={(e) => setSerialNum(e.target.value)} />
+      </Field>
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="size-4 rounded border-input" />
+        Feature on the home page
+      </label>
+      <div className="flex gap-2">
+        <Button type="submit" className="flex-1" disabled={pending}>
+          {pending ? "Saving…" : "Save changes"}
+        </Button>
+        <Button type="button" variant="outline" className="flex-1" disabled={pending} onClick={onCancel}>
+          Cancel
+        </Button>
+      </div>
     </form>
   );
 }

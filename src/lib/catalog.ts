@@ -559,3 +559,75 @@ export const deleteListing = createServerFn({ method: "POST" })
     if (!rows[0]) throw new Error("Listing not found.");
     return { ok: true };
   });
+
+export const updateListing = createServerFn({ method: "POST" })
+  .validator(
+    z.object({
+      productId: z.number().int(),
+      title: z.string().min(3).max(120),
+      player: z.string().max(80).optional(),
+      setName: z.string().max(80).optional(),
+      year: z.number().int().min(1950).max(2030).optional(),
+      sport: z.enum(["basketball", "wnba", "football", "baseball", "nonsport"]),
+      kind: z.enum(["single", "slab", "auto", "relic", "sealed", "break-spot"]),
+      parallel: z.string().max(40).optional(),
+      serialNum: z.string().max(20).optional(),
+      grade: z.string().max(20).optional(),
+      priceCents: z.number().int().min(100).max(10000000),
+      qty: z.number().int().min(0).max(99),
+      description: z.string().max(800).optional(),
+      featured: z.boolean().optional(),
+      imageUrl: imageUrlSchema.optional(),
+      imageUrlBack: imageUrlSchema.optional().nullable(),
+      imageDepiction: z.boolean().optional(),
+    }),
+  )
+  .middleware([authMiddleware])
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await requireOwner(context.userId);
+    const { getSql } = await import("./db");
+    const sql = await getSql();
+    const sport = resolveSport(data.sport, data.title, data.player, data.setName, data.parallel);
+    const rows = await sql.query<{ id: number }>(
+      `update products set
+         title = $1,
+         player = $2,
+         set_name = $3,
+         year = $4,
+         sport = $5,
+         kind = $6,
+         parallel = $7,
+         serial_num = $8,
+         grade = $9,
+         price_cents = $10,
+         qty = $11,
+         description = $12,
+         featured = $13,
+         image_url = coalesce($14, image_url),
+         image_url_back = $15,
+         image_depiction = $16
+       where id = $17
+       returning id`,
+      [
+        data.title.trim(),
+        data.player?.trim() || null,
+        data.setName?.trim() || null,
+        data.year ?? null,
+        sport,
+        data.kind,
+        data.parallel?.trim() || null,
+        data.serialNum?.trim() || null,
+        data.grade?.trim() || null,
+        data.priceCents,
+        data.qty,
+        data.description?.trim() || null,
+        Boolean(data.featured),
+        data.imageUrl?.trim() || null,
+        data.imageUrlBack === undefined ? null : data.imageUrlBack?.trim() || null,
+        Boolean(data.imageDepiction),
+        data.productId,
+      ],
+    );
+    if (!rows[0]) throw new Error("Listing not found.");
+    return { ok: true };
+  });
