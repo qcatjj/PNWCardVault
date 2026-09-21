@@ -4,6 +4,7 @@ import { type FormEvent, type ReactNode, useState } from "react";
 import { CartButton, CartSheet } from "@/components/cart-sheet";
 import { HubMark } from "@/components/hub-mark";
 import { LiveTicker } from "@/components/live-ticker";
+import { ShopMenu } from "@/components/shop-menu";
 import { SportsBackdrop } from "@/components/sports-backdrop";
 import { Input } from "@/components/ui/input";
 import { cartCount, useCart } from "@/lib/cart";
@@ -36,7 +37,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="relative flex min-h-dvh min-w-0 w-full flex-col bg-background text-foreground">
       <SportsBackdrop />
       <header className="sticky top-2 z-40 px-3 pt-[env(safe-area-inset-top)] sm:px-4">
-        <div className="glass mx-auto flex h-14 max-w-6xl items-center gap-3 rounded-[22px] border border-border px-3 sm:px-4">
+        <div className="glass mx-auto flex h-14 max-w-6xl items-center gap-2 rounded-[22px] border border-border px-2 sm:gap-3 sm:px-3">
+          <ShopMenu />
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <HubMark className="size-8 text-base" />
             <span className="flex flex-col leading-none">
