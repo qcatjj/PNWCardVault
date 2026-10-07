@@ -5,7 +5,7 @@ import { requireOwner } from "@/lib/desk-owner";
 import { slugify } from "./utils";
 import { chargeTestToken } from "./stripe-test";
 import type { Drop, ListFilters, Order, OrderItem, OrderPayment, Product } from "./catalog-types";
-import { listingSport, matchesSport } from "./catalog-types";
+import { listingSport, matchesKind, matchesSport } from "./catalog-types";
 import type { Sql } from "./db";
 
 type ProductRow = {
@@ -115,16 +115,8 @@ export const listProducts = createServerFn({ method: "GET" })
     const params: unknown[] = [];
     let i = 1;
 
-    // Resolve legacy categories before filtering or limiting. A SQL comparison
-    // against only p.sport excludes recognizable cards with stale categories.
-    if (filters.kind === "sealed") {
-      clauses.push(`(p.kind = $${i} or p.kind = $${i + 1})`);
-      params.push("sealed", "break-spot");
-      i += 2;
-    } else if (filters.kind) {
-      clauses.push(`p.kind = $${i++}`);
-      params.push(filters.kind);
-    }
+    // Resolve categories before filtering or limiting. Autographed singles,
+    // slabs, and relics belong in Autos too, regardless of their saved kind.
     if (filters.dropSlug) {
       clauses.push(`d.slug = $${i++}`);
       params.push(filters.dropSlug);
@@ -151,13 +143,14 @@ export const listProducts = createServerFn({ method: "GET" })
        left join drops d on d.id = p.drop_id
        ${where}
        order by ${order}
-       ${limit && !filters.sport ? `limit ${limit}` : ""}`,
+       ${limit && !filters.sport && !filters.kind ? `limit ${limit}` : ""}`,
       params,
     );
     const products = rows.map(mapProduct);
-    const matching = filters.sport
-      ? products.filter((product) => matchesSport(product.sport, filters.sport!))
-      : products;
+    const matching = products.filter((product) =>
+      (!filters.sport || matchesSport(product.sport, filters.sport)) &&
+      (!filters.kind || matchesKind(product, filters.kind))
+    );
     return limit ? matching.slice(0, limit) : matching;
   });
 

@@ -152,6 +152,16 @@ export function matchesSport(actual: string, requested: string): boolean {
   return actual === sport || (sport === "basketball" && actual === "wnba");
 }
 
+/** Autographs can also be singles, slabs, or patch cards. */
+export function matchesKind(product: Pick<Product, "kind" | "title" | "setName" | "parallel" | "description">, requested: string): boolean {
+  if (requested === "sealed") return product.kind === "sealed" || product.kind === "break-spot";
+  if (product.kind === requested) return true;
+  if (requested !== "auto" || product.kind === "sealed" || product.kind === "break-spot") return false;
+  const details = [product.title, product.setName, product.parallel, product.description].filter(Boolean).join(" ");
+  if (/\b(?:non[- ]?auto|no autograph|not autographed|unsigned|facsimile|printed signature)\b/i.test(details)) return false;
+  return /\b(?:auto(?:s|graph(?:s|ed)?)?|on[- ]card auto|signed|signature(?:s)?)\b/i.test(details);
+}
+
 export function kindLabel(id: string) {
   if (id === "break-spot") return "Sealed";
   return KINDS.find((k) => k.id === id)?.label ?? id;
