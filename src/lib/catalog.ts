@@ -5,7 +5,7 @@ import { requireOwner } from "@/lib/desk-owner";
 import { slugify } from "./utils";
 import { chargeTestToken } from "./stripe-test";
 import type { Drop, ListFilters, Order, OrderItem, OrderPayment, Product } from "./catalog-types";
-import { resolveSport } from "./catalog-types";
+import { listingSport, matchesSport } from "./catalog-types";
 import type { Sql } from "./db";
 
 type ProductRow = {
@@ -69,6 +69,7 @@ const productSelect = `
 function mapProduct(row: ProductRow): Product {
   return {
     ...row,
+    sport: listingSport(row),
     year: row.year == null ? null : Number(row.year),
     priceCents: Number(row.priceCents),
     compareAtCents: row.compareAtCents == null ? null : Number(row.compareAtCents),
@@ -114,10 +115,8 @@ export const listProducts = createServerFn({ method: "GET" })
     const params: unknown[] = [];
     let i = 1;
 
-    if (filters.sport) {
-      clauses.push(`p.sport = $${i++}`);
-      params.push(filters.sport);
-    }
+    // Resolve legacy categories before filtering or limiting. A SQL comparison
+    // against only p.sport excludes recognizable cards with stale categories.
     if (filters.kind === "sealed") {
       clauses.push(`(p.kind = $${i} or p.kind = $${i + 1})`);
       params.push("sealed", "break-spot");
@@ -152,10 +151,14 @@ export const listProducts = createServerFn({ method: "GET" })
        left join drops d on d.id = p.drop_id
        ${where}
        order by ${order}
-       ${limit ? `limit ${limit}` : ""}`,
+       ${limit && !filters.sport ? `limit ${limit}` : ""}`,
       params,
     );
-    return rows.map(mapProduct);
+    const products = rows.map(mapProduct);
+    const matching = filters.sport
+      ? products.filter((product) => matchesSport(product.sport, filters.sport!))
+      : products;
+    return limit ? matching.slice(0, limit) : matching;
   });
 
 export const getProduct = createServerFn({ method: "GET" })
@@ -262,7 +265,7 @@ export const createListing = createServerFn({ method: "POST" })
     await requireOwner(context.userId);
     const { getSql } = await import("./db");
     const sql = await getSql();
-    const sport = resolveSport(data.sport, data.title, data.player, data.setName, data.parallel);
+    const sport = listingSport({ ...data, player: data.player ?? null, setName: data.setName ?? null, parallel: data.parallel ?? null, description: data.description ?? null });
     let slug = slugify(data.title);
     const existing = await sql.query<{ slug: string }>(`select slug from products where slug = $1`, [slug]);
     if (existing[0]) slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
@@ -587,7 +590,7 @@ export const updateListing = createServerFn({ method: "POST" })
     await requireOwner(context.userId);
     const { getSql } = await import("./db");
     const sql = await getSql();
-    const sport = resolveSport(data.sport, data.title, data.player, data.setName, data.parallel);
+    const sport = listingSport({ ...data, player: data.player ?? null, setName: data.setName ?? null, parallel: data.parallel ?? null, description: data.description ?? null });
     const rows = await sql.query<{ id: number }>(
       `update products set
          title = $1,

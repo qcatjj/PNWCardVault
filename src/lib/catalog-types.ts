@@ -99,7 +99,7 @@ export function sportLabel(id: string) {
 const SPORT_HINTS: { id: SportId; re: RegExp }[] = [
   {
     id: "wnba",
-    re: /\bwnba\b|caitlin clark|paige bueckers|napheesa|angel reese|a'?ja wilson|breanna stewart|cameron brink|kelsey plum/,
+    re: /\bwnba\b|caitlin clark|paige bueckers|napheesa|angel reese|a'?ja wilson|breanna stewart|cameron brink|kelsey plum|sue bird|diana taurasi|sabrina ionescu|jewell loyd|candace parker|lisa leslie|seattle storm|las vegas aces|new york liberty|indiana fever/,
   },
   {
     id: "football",
@@ -111,7 +111,7 @@ const SPORT_HINTS: { id: SportId; re: RegExp }[] = [
   },
   {
     id: "basketball",
-    re: /\bnba\b|\bncaab\b|\bbasketball\b|\bhoops\b|cooper flagg|wembanyama|gilgeous|lamelo|lebron|stephen curry/,
+    re: /\bnba\b|\bncaab\b|\bbasketball\b|\bhoops\b|cooper flagg|wembanyama|gilgeous|lamelo|lebron|stephen curry|steph curry|michael jordan|kobe bryant|luka don[cč]i[cć]|jayson tatum|giannis|nikola jokic|nikola jokić|kevin durant|anthony edwards|chet holmgren|kevin garnett|tim duncan|shaquille o'?neal|allen iverson|scottie pippen|larry bird|magic johnson|kareem|bill russell|los angeles lakers|boston celtics|chicago bulls|golden state warriors|oklahoma city thunder|san antonio spurs|portland trail blazers|seattle supersonics/,
   },
   {
     id: "nonsport",
@@ -136,6 +136,20 @@ export function inferSport(...parts: Array<string | null | undefined>): SportId 
 
 export function resolveSport(selected: SportId, ...hints: Array<string | null | undefined>): SportId {
   return inferSport(...hints) ?? selected;
+}
+
+/** Resolve old/imported listings as well as new uploads, without rewriting inventory. */
+export function listingSport(product: Pick<Product, "sport" | "title" | "player" | "setName" | "parallel" | "description">): string {
+  return inferSport(product.title, product.player, product.setName, product.parallel)
+    ?? inferSport(product.description)
+    ?? inferSport(product.sport)
+    ?? product.sport;
+}
+
+/** WNBA is both its own category and part of the overall basketball inventory. */
+export function matchesSport(actual: string, requested: string): boolean {
+  const sport = inferSport(requested) ?? requested;
+  return actual === sport || (sport === "basketball" && actual === "wnba");
 }
 
 export function kindLabel(id: string) {
