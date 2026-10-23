@@ -25,6 +25,7 @@ import { Route as OrderStripeRouteImport } from './routes/order.stripe'
 import { Route as ScoresIndexRouteImport } from './routes/scores.index'
 import { Route as ScoresIdRouteImport } from './routes/scores.$id'
 import { Route as VCodeRouteImport } from './routes/v.$code'
+import { Route as ApiAdminPirateShipExportRouteImport } from './routes/api/admin/pirate-ship-export'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -107,6 +108,12 @@ const VCodeRoute = VCodeRouteImport.update({
   path: '/v/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminPirateShipExportRoute =
+  ApiAdminPirateShipExportRouteImport.update({
+    id: '/api/admin/pirate-ship-export',
+    path: '/api/admin/pirate-ship-export',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/scores/': typeof ScoresIndexRoute
+  '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -148,6 +156,7 @@ export interface FileRoutesByTo {
   '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/scores': typeof ScoresIndexRoute
+  '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -168,6 +177,7 @@ export interface FileRoutesById {
   '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/scores/': typeof ScoresIndexRoute
+  '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/scores/$id'
     | '/v/$code'
     | '/scores/'
+    | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/scores/$id'
     | '/v/$code'
     | '/scores'
+    | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -226,6 +238,7 @@ export interface FileRouteTypes {
     | '/scores/$id'
     | '/v/$code'
     | '/scores/'
+    | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -244,6 +257,7 @@ export interface RootRouteChildren {
   OrderCodeRoute: typeof OrderCodeRoute
   OrderStripeRoute: typeof OrderStripeRoute
   VCodeRoute: typeof VCodeRoute
+  ApiAdminPirateShipExportRoute: typeof ApiAdminPirateShipExportRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -361,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/pirate-ship-export': {
+      id: '/api/admin/pirate-ship-export'
+      path: '/api/admin/pirate-ship-export'
+      fullPath: '/api/admin/pirate-ship-export'
+      preLoaderRoute: typeof ApiAdminPirateShipExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -399,6 +420,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrderCodeRoute: OrderCodeRoute,
   OrderStripeRoute: OrderStripeRoute,
   VCodeRoute: VCodeRoute,
+  ApiAdminPirateShipExportRoute: ApiAdminPirateShipExportRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

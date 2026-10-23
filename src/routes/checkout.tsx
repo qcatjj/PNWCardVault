@@ -319,6 +319,9 @@ function ModeBanner({ mode, onFillTest }: { mode: PaymentMode; onFillTest: () =>
   );
 }
 
+// Mirrors SHIPPING_CENTS in stripe-checkout.server.ts (tracked USPS, charged on Stripe).
+const SHIPPING_FLAT_CENTS = 500;
+
 function OrderLines({ lines, total }: { lines: CartLine[]; total: number }) {
   return (
     <>
@@ -338,11 +341,11 @@ function OrderLines({ lines, total }: { lines: CartLine[]; total: number }) {
       </ul>
       <div className="mt-4 flex items-center justify-between text-sm">
         <span className="text-muted-foreground">Shipping</span>
-        <span>Included</span>
+        <span className="tabular-nums">{formatPrice(SHIPPING_FLAT_CENTS)}</span>
       </div>
       <div className="mt-2 flex items-center justify-between">
         <span>Total</span>
-        <span className="font-display text-2xl tabular-nums">{formatPrice(total)}</span>
+        <span className="font-display text-2xl tabular-nums">{formatPrice(total + SHIPPING_FLAT_CENTS)}</span>
       </div>
     </>
   );
