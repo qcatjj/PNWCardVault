@@ -19,12 +19,14 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ScoresRouteImport } from './routes/scores'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
+import { Route as DeskOrdersRouteImport } from './routes/desk_.orders'
 import { Route as DropSlugRouteImport } from './routes/drop.$slug'
 import { Route as OrderCodeRouteImport } from './routes/order.$code'
 import { Route as OrderStripeRouteImport } from './routes/order.stripe'
 import { Route as ScoresIndexRouteImport } from './routes/scores.index'
 import { Route as ScoresIdRouteImport } from './routes/scores.$id'
 import { Route as VCodeRouteImport } from './routes/v.$code'
+import { Route as ApiAdminPirateShipExportRouteImport } from './routes/api/admin/pirate-ship-export'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -77,6 +79,11 @@ const CSlugRoute = CSlugRouteImport.update({
   path: '/c/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeskOrdersRoute = DeskOrdersRouteImport.update({
+  id: '/desk_/orders',
+  path: '/desk/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DropSlugRoute = DropSlugRouteImport.update({
   id: '/drop/$slug',
   path: '/drop/$slug',
@@ -107,6 +114,12 @@ const VCodeRoute = VCodeRouteImport.update({
   path: '/v/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminPirateShipExportRoute =
+  ApiAdminPirateShipExportRouteImport.update({
+    id: '/api/admin/pirate-ship-export',
+    path: '/api/admin/pirate-ship-export',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -124,12 +137,14 @@ export interface FileRoutesByFullPath {
   '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
+  '/desk/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
   '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/scores/': typeof ScoresIndexRoute
+  '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -142,12 +157,14 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
+  '/desk/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
   '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/scores': typeof ScoresIndexRoute
+  '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -162,12 +179,14 @@ export interface FileRoutesById {
   '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
+  '/desk_/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
   '/scores/$id': typeof ScoresIdRoute
   '/v/$code': typeof VCodeRoute
   '/scores/': typeof ScoresIndexRoute
+  '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -183,12 +202,14 @@ export interface FileRouteTypes {
     | '/scores'
     | '/shop'
     | '/c/$slug'
+    | '/desk/orders'
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
     | '/scores/$id'
     | '/v/$code'
     | '/scores/'
+    | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -201,12 +222,14 @@ export interface FileRouteTypes {
     | '/login'
     | '/shop'
     | '/c/$slug'
+    | '/desk/orders'
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
     | '/scores/$id'
     | '/v/$code'
     | '/scores'
+    | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -220,12 +243,14 @@ export interface FileRouteTypes {
     | '/scores'
     | '/shop'
     | '/c/$slug'
+    | '/desk_/orders'
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
     | '/scores/$id'
     | '/v/$code'
     | '/scores/'
+    | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -240,10 +265,12 @@ export interface RootRouteChildren {
   ScoresRoute: typeof ScoresRouteWithChildren
   ShopRoute: typeof ShopRoute
   CSlugRoute: typeof CSlugRoute
+  DeskOrdersRoute: typeof DeskOrdersRoute
   DropSlugRoute: typeof DropSlugRoute
   OrderCodeRoute: typeof OrderCodeRoute
   OrderStripeRoute: typeof OrderStripeRoute
   VCodeRoute: typeof VCodeRoute
+  ApiAdminPirateShipExportRoute: typeof ApiAdminPirateShipExportRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -319,6 +346,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/desk_/orders': {
+      id: '/desk_/orders'
+      path: '/desk/orders'
+      fullPath: '/desk/orders'
+      preLoaderRoute: typeof DeskOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/drop/$slug': {
       id: '/drop/$slug'
       path: '/drop/$slug'
@@ -361,6 +395,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/pirate-ship-export': {
+      id: '/api/admin/pirate-ship-export'
+      path: '/api/admin/pirate-ship-export'
+      fullPath: '/api/admin/pirate-ship-export'
+      preLoaderRoute: typeof ApiAdminPirateShipExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -395,10 +436,12 @@ const rootRouteChildren: RootRouteChildren = {
   ScoresRoute: ScoresRouteWithChildren,
   ShopRoute: ShopRoute,
   CSlugRoute: CSlugRoute,
+  DeskOrdersRoute: DeskOrdersRoute,
   DropSlugRoute: DropSlugRoute,
   OrderCodeRoute: OrderCodeRoute,
   OrderStripeRoute: OrderStripeRoute,
   VCodeRoute: VCodeRoute,
+  ApiAdminPirateShipExportRoute: ApiAdminPirateShipExportRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
