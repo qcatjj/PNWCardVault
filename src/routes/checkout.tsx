@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/product-seo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -26,6 +27,11 @@ type CheckoutSearch = {
 };
 
 export const Route = createFileRoute("/checkout")({
+  head: () =>
+    pageHead(
+      "Checkout",
+      "Review your cards and pay securely with Stripe. $6 tracked USPS shipping from Selah, WA.",
+    ),
   validateSearch: (search: Record<string, unknown>): CheckoutSearch => ({
     bin: typeof search.bin === "string" ? search.bin : undefined,
     qty:

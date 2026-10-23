@@ -173,7 +173,7 @@ export function productImageSrc(product: {
 }) {
   if (product.imageUrl) return product.imageUrl;
   if (!product.imageKey || product.imageKey === "face") return null;
-  return `/cards/${product.imageKey}.jpg`;
+  return `/cards/${product.imageKey}.webp`;
 }
 
 export function listingPath(product: Pick<Product, "slug" | "shortCode">) {

@@ -1,11 +1,20 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Home, LayoutGrid, Lock, Search, ShoppingBag, Sparkles } from "lucide-react";
+import {
+  Home,
+  LayoutGrid,
+  Lock,
+  Search,
+  ShoppingBag,
+  SlidersHorizontal,
+  Sparkles,
+} from "lucide-react";
 import { type FormEvent, type ReactNode, useState } from "react";
 import { CartButton, CartSheet } from "@/components/cart-sheet";
 import { HubMark } from "@/components/hub-mark";
 import { LiveTicker } from "@/components/live-ticker";
 import { ShopMenu } from "@/components/shop-menu";
 import { SportsBackdrop } from "@/components/sports-backdrop";
+import { TrustStrip } from "@/components/trust-strip";
 import { Input } from "@/components/ui/input";
 import { cartCount, useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
@@ -93,11 +102,18 @@ export function AppShell({ children }: { children: ReactNode }) {
           <LiveTicker />
         </div>
       </header>
-      <div className="relative z-10 min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
+      <div className="relative z-10 mx-auto mt-2 w-full max-w-6xl px-3 sm:px-4">
+        <TrustStrip />
+      </div>
+      <div className="relative z-10 min-w-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+        {children}
+      </div>
       <footer className="relative z-10 border-t border-border pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-0">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-6">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">Pacific Northwest</p>
+            <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
+              Pacific Northwest
+            </p>
             <p className="mt-2 font-display text-3xl">PNW Card Hub</p>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
               Singles and slabs from the case. Ships after checkout.
@@ -107,7 +123,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Link to="/contact" className="text-sm font-semibold hover:text-primary">
               Contact & reviews
             </Link>
-            <a href="mailto:pnwcardhub@gmail.com" className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground">
+            <a
+              href="mailto:pnwcardhub@gmail.com"
+              className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground"
+            >
               pnwcardhub@gmail.com
             </a>
             <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
@@ -117,15 +136,27 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </footer>
       <nav
-        className="fixed inset-x-2.5 bottom-2.5 z-40 grid h-[4.25rem] grid-cols-4 rounded-[20px] border border-border bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-2.5 bottom-2.5 z-40 grid h-[4.25rem] grid-cols-5 rounded-[20px] border border-border bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
         aria-label="App"
       >
         <TabLink to="/" label="Home" active={pathname === "/"}>
           <Home className="size-5" />
         </TabLink>
-        <TabLink to="/shop" label="Shop" active={pathname.startsWith("/shop") || pathname.startsWith("/c/")}>
+        <TabLink
+          to="/shop"
+          label="Shop"
+          active={pathname.startsWith("/shop") || pathname.startsWith("/c/")}
+        >
           <LayoutGrid className="size-5" />
         </TabLink>
+        <Link
+          to="/shop"
+          search={{ filters: "open" }}
+          className="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold text-muted-foreground"
+        >
+          <SlidersHorizontal className="size-5" />
+          Filters
+        </Link>
         <TabLink to="/drops" label="Drops" active={pathname.startsWith("/drops")}>
           <Sparkles className="size-5" />
         </TabLink>

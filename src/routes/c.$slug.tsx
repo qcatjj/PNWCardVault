@@ -1,9 +1,11 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { ListingMissing, ProductView } from "@/components/product-view";
 import { getProduct, listProducts } from "@/lib/catalog";
+import { productHead } from "@/lib/product-seo";
 
 export const Route = createFileRoute("/c/$slug")({
   loader: async ({ params }) => loadListing(params.slug),
+  head: ({ loaderData }) => productHead(loaderData?.product),
   component: ProductPage,
   notFoundComponent: ListingMissing,
 });

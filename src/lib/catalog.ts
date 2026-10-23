@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { publicImageUrls } from "@/lib/listing-facts";
 import { z } from "zod";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { requireOwner } from "@/lib/desk-owner";
@@ -151,7 +152,8 @@ export const listProducts = createServerFn({ method: "GET" })
       (!filters.sport || matchesSport(product.sport, filters.sport)) &&
       (!filters.kind || matchesKind(product, filters.kind))
     );
-    return limit ? matching.slice(0, limit) : matching;
+    const out = limit ? matching.slice(0, limit) : matching;
+    return out.map(publicImageUrls);
   });
 
 export const getProduct = createServerFn({ method: "GET" })
@@ -167,7 +169,7 @@ export const getProduct = createServerFn({ method: "GET" })
        limit 1`,
       [data.slug],
     );
-    return rows[0] ? mapProduct(rows[0]) : null;
+    return rows[0] ? publicImageUrls(mapProduct(rows[0])) : null;
   });
 
 type DropRow = {

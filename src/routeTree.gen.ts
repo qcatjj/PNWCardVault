@@ -18,6 +18,7 @@ import { Route as LiveRouteImport } from './routes/live'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ScoresRouteImport } from './routes/scores'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
 import { Route as DeskOrdersRouteImport } from './routes/desk_.orders'
 import { Route as DropSlugRouteImport } from './routes/drop.$slug'
@@ -28,6 +29,7 @@ import { Route as ScoresIdRouteImport } from './routes/scores.$id'
 import { Route as VCodeRouteImport } from './routes/v.$code'
 import { Route as ApiAdminPirateShipExportRouteImport } from './routes/api/admin/pirate-ship-export'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ImgIdFileRouteImport } from './routes/img.$id.$file'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -72,6 +74,11 @@ const ScoresRoute = ScoresRouteImport.update({
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CSlugRoute = CSlugRouteImport.update({
@@ -125,6 +132,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImgIdFileRoute = ImgIdFileRouteImport.update({
+  id: '/img/$id/$file',
+  path: '/img/$id/$file',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -136,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/c/$slug': typeof CSlugRoute
   '/desk/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
@@ -146,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/scores/': typeof ScoresIndexRoute
   '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/img/$id/$file': typeof ImgIdFileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -156,6 +170,7 @@ export interface FileRoutesByTo {
   '/live': typeof LiveRoute
   '/login': typeof LoginRoute
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/c/$slug': typeof CSlugRoute
   '/desk/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
@@ -166,6 +181,7 @@ export interface FileRoutesByTo {
   '/scores': typeof ScoresIndexRoute
   '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/img/$id/$file': typeof ImgIdFileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -178,6 +194,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/c/$slug': typeof CSlugRoute
   '/desk_/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
@@ -188,6 +205,7 @@ export interface FileRoutesById {
   '/scores/': typeof ScoresIndexRoute
   '/api/admin/pirate-ship-export': typeof ApiAdminPirateShipExportRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/img/$id/$file': typeof ImgIdFileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -201,6 +219,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/scores'
     | '/shop'
+    | '/sitemap.xml'
     | '/c/$slug'
     | '/desk/orders'
     | '/drop/$slug'
@@ -211,6 +230,7 @@ export interface FileRouteTypes {
     | '/scores/'
     | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
+    | '/img/$id/$file'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -221,6 +241,7 @@ export interface FileRouteTypes {
     | '/live'
     | '/login'
     | '/shop'
+    | '/sitemap.xml'
     | '/c/$slug'
     | '/desk/orders'
     | '/drop/$slug'
@@ -231,6 +252,7 @@ export interface FileRouteTypes {
     | '/scores'
     | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
+    | '/img/$id/$file'
   id:
     | '__root__'
     | '/'
@@ -242,6 +264,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/scores'
     | '/shop'
+    | '/sitemap.xml'
     | '/c/$slug'
     | '/desk_/orders'
     | '/drop/$slug'
@@ -252,6 +275,7 @@ export interface FileRouteTypes {
     | '/scores/'
     | '/api/admin/pirate-ship-export'
     | '/api/auth/$'
+    | '/img/$id/$file'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -264,6 +288,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ScoresRoute: typeof ScoresRouteWithChildren
   ShopRoute: typeof ShopRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CSlugRoute: typeof CSlugRoute
   DeskOrdersRoute: typeof DeskOrdersRoute
   DropSlugRoute: typeof DropSlugRoute
@@ -272,6 +297,7 @@ export interface RootRouteChildren {
   VCodeRoute: typeof VCodeRoute
   ApiAdminPirateShipExportRoute: typeof ApiAdminPirateShipExportRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ImgIdFileRoute: typeof ImgIdFileRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -337,6 +363,13 @@ declare module '@tanstack/react-router' {
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/c/$slug': {
@@ -409,6 +442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/img/$id/$file': {
+      id: '/img/$id/$file'
+      path: '/img/$id/$file'
+      fullPath: '/img/$id/$file'
+      preLoaderRoute: typeof ImgIdFileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -435,6 +475,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ScoresRoute: ScoresRouteWithChildren,
   ShopRoute: ShopRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   CSlugRoute: CSlugRoute,
   DeskOrdersRoute: DeskOrdersRoute,
   DropSlugRoute: DropSlugRoute,
@@ -443,6 +484,7 @@ const rootRouteChildren: RootRouteChildren = {
   VCodeRoute: VCodeRoute,
   ApiAdminPirateShipExportRoute: ApiAdminPirateShipExportRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ImgIdFileRoute: ImgIdFileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

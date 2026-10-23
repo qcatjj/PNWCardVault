@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { ProductGrid } from "@/components/product-card";
+import { ProductGrid, ProductRail } from "@/components/product-card";
+import { PnwHero } from "@/components/pnw-hero";
 import { ScoreCard } from "@/components/score-card";
-import { ShowStack } from "@/components/show-stack";
 import { listProducts } from "@/lib/catalog";
 import type { Product } from "@/lib/catalog-types";
 import { getScoreboard, matchListings } from "@/lib/scores";
@@ -24,13 +24,25 @@ export const Route = createFileRoute("/")({
     const featured = stock.filter((item) => item.featured).slice(0, 8);
     const latest = stock.slice(0, 16);
     const slabs = stock.filter((item) => item.kind === "slab").slice(0, 8);
-    return { featured, latest, slabs, games, stock };
+    const heroCards = [...stock].sort((a, b) => b.priceCents - a.priceCents).slice(0, 3);
+    return { featured, latest, slabs, games, stock, heroCards };
   },
+  head: () => ({
+    meta: [
+      { title: "PNW Card Hub · Sports cards from Selah, WA" },
+      {
+        name: "description",
+        content:
+          "Rookies, autos and numbered sports cards from the Yakima Valley. $6 tracked USPS shipping from Selah, WA and secure Stripe checkout.",
+      },
+      { property: "og:title", content: "PNW Card Hub · Sports cards from Selah, WA" },
+    ],
+  }),
   component: Home,
 });
 
 function Home() {
-  const { featured, latest, slabs, games, stock } = Route.useLoaderData();
+  const { featured, latest, slabs, games, stock, heroCards } = Route.useLoaderData();
   const pool = unique([...featured, ...latest]);
   const hot = (featured.length ? featured : latest).slice(0, 8);
   const under50 = pool.filter((item) => item.priceCents <= 5000).slice(0, 8);
@@ -43,39 +55,11 @@ function Home() {
 
   return (
     <main>
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-10 pb-6 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:pt-16">
-        <div className="relative z-10">
-          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-foreground">
-            <span className="live-dot size-2 rounded-full bg-primary" />
-            Cards on the table
-          </p>
-          <h1 className="mt-4 max-w-xl text-6xl text-foreground md:text-8xl">
-            Own the
-            <br />
-            <span className="stroke-title">hobby.</span>
-          </h1>
-          <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
-            Pacific Northwest sports-card shop for singles and slabs. Buy now with Stripe — ships after checkout.
-          </p>
-          <div className="mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
-            <Link
-              to="/shop"
-              className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground shadow-[0_10px_32px_color-mix(in_oklab,var(--color-primary)_16%,transparent)]"
-            >
-              Shop cards
-            </Link>
-            <Link
-              to="/drops"
-              className="inline-flex h-12 items-center justify-center rounded-xl border border-border bg-foreground/5 px-5 text-sm font-bold"
-            >
-              View new drops
-            </Link>
-          </div>
-        </div>
-        <ShowStack />
-      </section>
+      <div className="px-3 sm:px-4">
+        <PnwHero featured={heroCards} />
+      </div>
 
-      <section className="mx-auto max-w-6xl px-4 sm:px-6">
+      <section className="mx-auto mt-6 max-w-6xl px-4 sm:px-6">
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
           <Chip to="/shop">All</Chip>
           {BOXES.map((box) => (
@@ -108,13 +92,19 @@ function Home() {
               </p>
               <h2 className="mt-2 text-3xl md:text-4xl">On the board</h2>
             </div>
-            <Link to="/scores" className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex">
+            <Link
+              to="/scores"
+              className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex"
+            >
               All scores <ArrowRight className="size-4" />
             </Link>
           </div>
           <div className="space-y-8">
             {board.map(({ game, cards }) => (
-              <div key={game.id} className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-start">
+              <div
+                key={game.id}
+                className="grid gap-4 lg:grid-cols-[minmax(0,18rem)_1fr] lg:items-start"
+              >
                 <ScoreCard game={game} />
                 <ProductGrid products={cards} />
               </div>
@@ -138,8 +128,8 @@ function Home() {
             </p>
             <h2 className="mt-3 text-4xl md:text-5xl">Cards. Sealed. Culture.</h2>
             <p className="mt-3 text-sm text-muted-foreground md:text-base">
-              PNW Card Hub is a private Pacific Northwest shop. Listings come from the owner desk. No buyer account —
-              pay on Stripe and keep the order code as the packing slip.
+              PNW Card Hub is a private Pacific Northwest shop. Listings come from the owner desk.
+              No buyer account — pay on Stripe and keep the order code as the packing slip.
             </p>
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:mt-0 sm:flex-row">
@@ -188,16 +178,23 @@ function Shelf({
       <div className="mb-6 flex items-end justify-between gap-4">
         <h2 className="text-3xl md:text-4xl">{title}</h2>
         {to ? (
-          <Link to={to} search={search} className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex">
+          <Link
+            to={to}
+            search={search}
+            className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex"
+          >
             See all <ArrowRight className="size-4" />
           </Link>
         ) : (
-          <Link to="/shop" className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex">
+          <Link
+            to="/shop"
+            className="hidden items-center gap-1 text-sm font-semibold text-primary sm:inline-flex"
+          >
             Shop all <ArrowRight className="size-4" />
           </Link>
         )}
       </div>
-      <ProductGrid products={products} />
+      <ProductRail products={products} />
     </section>
   );
 }

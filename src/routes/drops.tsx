@@ -1,8 +1,14 @@
+import { pageHead } from "@/lib/product-seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ProductGrid } from "@/components/product-card";
 import { listProducts } from "@/lib/catalog";
 
 export const Route = createFileRoute("/drops")({
+  head: () =>
+    pageHead(
+      "New drops",
+      "Fresh sports-card listings from PNW Card Hub in Selah, WA. $6 tracked USPS shipping.",
+    ),
   loader: () => listProducts({ data: { inStock: true, sort: "newest", limit: 24 } }),
   component: Drops,
 });
