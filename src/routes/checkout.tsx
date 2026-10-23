@@ -14,7 +14,12 @@ import { getProduct, placeOrder } from "@/lib/catalog";
 import type { Product } from "@/lib/catalog-types";
 import { formatPrice } from "@/lib/format";
 import { getPaymentMode, startStripeCheckout, type PaymentMode } from "@/lib/stripe-api";
-import { type CardValue, TEST_CARD, cardComplete, tokenizeCard } from "@/lib/stripe-test";
+import {
+  type CardValue,
+  TEST_CARD,
+  cardComplete,
+  tokenizeCard,
+} from "@/lib/stripe-test";
 
 type CheckoutSearch = {
   bin?: string;
@@ -297,8 +302,7 @@ function ModeBanner({ mode, onFillTest }: { mode: PaymentMode; onFillTest: () =>
       <div className="border-b border-border bg-muted">
         <div className="mx-auto max-w-6xl px-4 py-2.5 sm:px-6">
           <p className="text-xs text-muted-foreground">
-            Payments connect to Stripe so the owner gets paid. Checkout opens as soon as that
-            account is linked.
+            Payments connect to Stripe so the owner gets paid. Checkout opens as soon as that account is linked.
           </p>
         </div>
       </div>
@@ -347,9 +351,7 @@ function OrderLines({ lines, total }: { lines: CartLine[]; total: number }) {
       </div>
       <div className="mt-2 flex items-center justify-between">
         <span>Total</span>
-        <span className="font-display text-2xl tabular-nums">
-          {formatPrice(total + SHIPPING_FLAT_CENTS)}
-        </span>
+        <span className="font-display text-2xl tabular-nums">{formatPrice(total + SHIPPING_FLAT_CENTS)}</span>
       </div>
     </>
   );
@@ -359,8 +361,8 @@ function PendingPay() {
   return (
     <>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        The shop is live. Card charges wait on the owner’s Stripe account so the money lands there —
-        not in a test shop.
+        The shop is live. Card charges wait on the owner’s Stripe account so the money lands there — not in a
+        test shop.
       </p>
       <Button type="button" className="mt-8 w-full" size="lg" disabled>
         <Lock className="size-4" />
@@ -504,13 +506,7 @@ function PreviewPay({
           <Lock className="size-4" />
           {pending === "card" ? "Processing…" : `Pay ${formatPrice(total)}`}
         </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full"
-          onClick={onPayLink}
-          disabled={busy}
-        >
+        <Button type="button" variant="secondary" className="w-full" onClick={onPayLink} disabled={busy}>
           {pending === "link" ? "Redirecting…" : "Pay with Link (preview)"}
         </Button>
         <div className="flex items-center justify-between gap-3">

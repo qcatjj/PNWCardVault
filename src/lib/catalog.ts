@@ -136,8 +136,7 @@ export const listProducts = createServerFn({ method: "GET" })
     let order = "p.featured desc, p.id desc";
     if (filters.sort === "price-asc") order = "p.price_cents asc, p.id desc";
     if (filters.sort === "price-desc") order = "p.price_cents desc, p.id desc";
-    const limit =
-      typeof filters.limit === "number" ? Math.min(Math.max(filters.limit, 1), 80) : null;
+    const limit = typeof filters.limit === "number" ? Math.min(Math.max(filters.limit, 1), 80) : null;
 
     const rows = await sql.query<ProductRow>(
       `select ${productSelect}
@@ -149,10 +148,9 @@ export const listProducts = createServerFn({ method: "GET" })
       params,
     );
     const products = rows.map(mapProduct);
-    const matching = products.filter(
-      (product) =>
-        (!filters.sport || matchesSport(product.sport, filters.sport)) &&
-        (!filters.kind || matchesKind(product, filters.kind)),
+    const matching = products.filter((product) =>
+      (!filters.sport || matchesSport(product.sport, filters.sport)) &&
+      (!filters.kind || matchesKind(product, filters.kind))
     );
     const out = limit ? matching.slice(0, limit) : matching;
     return out.map(publicImageUrls);
@@ -234,10 +232,7 @@ export const getDrop = createServerFn({ method: "GET" })
 const imageUrlSchema = z
   .string()
   .max(280000)
-  .refine(
-    (value) => value.startsWith("https://") || value.startsWith("data:image/"),
-    "Photo must be a URL or an uploaded image.",
-  );
+  .refine((value) => value.startsWith("https://") || value.startsWith("data:image/"), "Photo must be a URL or an uploaded image.");
 
 export const createListing = createServerFn({ method: "POST" })
   .validator(
@@ -265,29 +260,16 @@ export const createListing = createServerFn({ method: "POST" })
     await requireOwner(context.userId);
     const { getSql } = await import("./db");
     const sql = await getSql();
-    const sport = listingSport({
-      ...data,
-      player: data.player ?? null,
-      setName: data.setName ?? null,
-      parallel: data.parallel ?? null,
-      description: data.description ?? null,
-    });
+    const sport = listingSport({ ...data, player: data.player ?? null, setName: data.setName ?? null, parallel: data.parallel ?? null, description: data.description ?? null });
     let slug = slugify(data.title);
-    const existing = await sql.query<{ slug: string }>(
-      `select slug from products where slug = $1`,
-      [slug],
-    );
+    const existing = await sql.query<{ slug: string }>(`select slug from products where slug = $1`, [slug]);
     if (existing[0]) slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
     let shortCode = makeShortCode(data.player, data.title);
     const taken = await sql.query<{ short_code: string }>(
       `select short_code from products where lower(short_code) = lower($1)`,
       [shortCode],
     );
-    if (taken[0])
-      shortCode = `${shortCode}${Math.random().toString(36).slice(2, 4).toUpperCase()}`.slice(
-        0,
-        10,
-      );
+    if (taken[0]) shortCode = `${shortCode}${Math.random().toString(36).slice(2, 4).toUpperCase()}`.slice(0, 10);
     await sql.query(
       `insert into products (
          slug, title, player, set_name, year, sport, kind, parallel, serial_num, grade,
@@ -320,10 +302,7 @@ export const createListing = createServerFn({ method: "POST" })
 function makeShortCode(player: string | undefined, title: string) {
   const source = player?.trim() || title;
   const last = source.split(/\s+/).filter(Boolean).at(-1) ?? source;
-  const code = last
-    .replace(/[^a-zA-Z0-9]/g, "")
-    .slice(0, 8)
-    .toUpperCase();
+  const code = last.replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toUpperCase();
   return code || "CARD";
 }
 
@@ -466,9 +445,7 @@ export const placeOrder = createServerFn({ method: "POST" })
         );
         const row = rows[0];
         if (!row) {
-          throw new Error(
-            "One of the listings sold while you were checking out. Refresh and try again.",
-          );
+          throw new Error("One of the listings sold while you were checking out. Refresh and try again.");
         }
         reserved.push({ id: Number(row.id), qty: item.qty });
         const price = Number(row.priceCents);
@@ -485,9 +462,7 @@ export const placeOrder = createServerFn({ method: "POST" })
       }
 
       for (let attempt = 0; attempt < 5; attempt += 1) {
-        const clash = await sql.query<{ code: string }>(`select code from orders where code = $1`, [
-          code,
-        ]);
+        const clash = await sql.query<{ code: string }>(`select code from orders where code = $1`, [code]);
         if (!clash[0]) break;
         code = orderCode();
       }
@@ -541,20 +516,20 @@ export const getInventory = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<Inventory> => {
     await requireOwner(context.userId);
     const { getSql } = await import("./db");
-    const sql = await getSql();
-    const productRows = await sql.query<ProductRow>(
-      `select ${productSelect}
+  const sql = await getSql();
+  const productRows = await sql.query<ProductRow>(
+    `select ${productSelect}
      from products p
      left join drops d on d.id = p.drop_id
      order by p.id desc`,
-    );
-    const orderRows = await sql.query<OrderRow>(
-      `select code, items_json as "itemsJson", total_cents as "totalCents", status, created_at as "createdAt",
+  );
+  const orderRows = await sql.query<OrderRow>(
+    `select code, items_json as "itemsJson", total_cents as "totalCents", status, created_at as "createdAt",
             payment_json as "paymentJson"
      from orders order by created_at desc limit 24`,
-    );
-    return { products: productRows.map(mapProduct), orders: orderRows.map(mapOrder) };
-  });
+  );
+  return { products: productRows.map(mapProduct), orders: orderRows.map(mapOrder) };
+});
 
 export const setListingQty = createServerFn({ method: "POST" })
   .validator(z.object({ productId: z.number().int(), qty: z.number().int().min(0).max(99) }))
@@ -563,10 +538,10 @@ export const setListingQty = createServerFn({ method: "POST" })
     await requireOwner(context.userId);
     const { getSql } = await import("./db");
     const sql = await getSql();
-    const rows = await sql.query<{ id: number }>(
-      `update products set qty = $1 where id = $2 returning id`,
-      [data.qty, data.productId],
-    );
+    const rows = await sql.query<{ id: number }>(`update products set qty = $1 where id = $2 returning id`, [
+      data.qty,
+      data.productId,
+    ]);
     if (!rows[0]) throw new Error("Listing not found.");
     return { ok: true };
   });
@@ -578,10 +553,7 @@ export const deleteListing = createServerFn({ method: "POST" })
     await requireOwner(context.userId);
     const { getSql } = await import("./db");
     const sql = await getSql();
-    const rows = await sql.query<{ id: number }>(
-      `delete from products where id = $1 returning id`,
-      [data.productId],
-    );
+    const rows = await sql.query<{ id: number }>(`delete from products where id = $1 returning id`, [data.productId]);
     if (!rows[0]) throw new Error("Listing not found.");
     return { ok: true };
   });
@@ -613,13 +585,7 @@ export const updateListing = createServerFn({ method: "POST" })
     await requireOwner(context.userId);
     const { getSql } = await import("./db");
     const sql = await getSql();
-    const sport = listingSport({
-      ...data,
-      player: data.player ?? null,
-      setName: data.setName ?? null,
-      parallel: data.parallel ?? null,
-      description: data.description ?? null,
-    });
+    const sport = listingSport({ ...data, player: data.player ?? null, setName: data.setName ?? null, parallel: data.parallel ?? null, description: data.description ?? null });
     const rows = await sql.query<{ id: number }>(
       `update products set
          title = $1,
