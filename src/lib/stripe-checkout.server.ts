@@ -33,7 +33,7 @@ function publicOrigin() {
   return `${proto}://${host.split(",")[0]!.trim()}`;
 }
 
-export const SHIPPING_CENTS = 500;
+export const SHIPPING_CENTS = 600;
 
 export type CheckoutItem = {
   title: string;
@@ -61,7 +61,7 @@ export async function createStripeCheckoutSession(
   params.set("phone_number_collection[enabled]", "true");
   params.append("shipping_address_collection[allowed_countries][]", "US");
   params.append("shipping_address_collection[allowed_countries][]", "CA");
-  // Flat $5.00 tracked shipping on every order.
+  // Flat $6.00 tracked shipping on every order.
   params.set("shipping_options[0][shipping_rate_data][type]", "fixed_amount");
   params.set("shipping_options[0][shipping_rate_data][fixed_amount][amount]", String(SHIPPING_CENTS));
   params.set("shipping_options[0][shipping_rate_data][fixed_amount][currency]", "usd");

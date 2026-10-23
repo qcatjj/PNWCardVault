@@ -320,7 +320,7 @@ function ModeBanner({ mode, onFillTest }: { mode: PaymentMode; onFillTest: () =>
 }
 
 // Mirrors SHIPPING_CENTS in stripe-checkout.server.ts (tracked USPS, charged on Stripe).
-const SHIPPING_FLAT_CENTS = 500;
+const SHIPPING_FLAT_CENTS = 600;
 
 function OrderLines({ lines, total }: { lines: CartLine[]; total: number }) {
   return (
