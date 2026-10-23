@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { ListingMissing, ProductView } from "@/components/product-view";
 import { getProduct, listProducts } from "@/lib/catalog";
+import { productHead } from "@/lib/product-seo";
 
 export const Route = createFileRoute("/v/$code")({
   loader: async ({ params }) => {
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/v/$code")({
     );
     return { product, related: related.slice(0, 4) };
   },
+  head: ({ loaderData }) => productHead(loaderData?.product),
   component: ShortListing,
   notFoundComponent: ListingMissing,
 });

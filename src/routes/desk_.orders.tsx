@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/product-seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -6,6 +7,7 @@ import { formatPrice } from "@/lib/format";
 import { buyOrderLabel, listPaidOrders, type AdminOrder } from "@/lib/orders-admin";
 
 export const Route = createFileRoute("/desk_/orders")({
+  head: () => pageHead("Orders", "Owner order desk."),
   component: OrdersPage,
 });
 

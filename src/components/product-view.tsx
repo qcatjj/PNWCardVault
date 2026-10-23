@@ -4,7 +4,9 @@ import { ProductGrid } from "@/components/product-card";
 import { ProductMedia } from "@/components/product-media";
 import { ShareKit } from "@/components/share-kit";
 import { Badge } from "@/components/ui/badge";
-import { kindLabel, productMeta, sportLabel, type Product } from "@/lib/catalog-types";
+import { ListingBadges, ListingTitle } from "@/components/listing-bits";
+import { TrustStrip } from "@/components/trust-strip";
+import { kindLabel, sportLabel, type Product } from "@/lib/catalog-types";
 import { formatPrice } from "@/lib/format";
 
 export function ProductView({ product, related }: { product: Product; related: Product[] }) {
@@ -27,15 +29,23 @@ export function ProductView({ product, related }: { product: Product; related: P
           product={product}
           className="aspect-[2.5/3.5] w-full rounded-[20px] border border-border"
           sizes="(min-width: 768px) 420px, 90vw"
+          priority
+          zoomable
         />
         <div className="pb-28 md:pb-0">
           <div className="flex flex-wrap gap-2">
             <Badge>{kindLabel(product.kind)}</Badge>
             <Badge>{sportLabel(product.sport)}</Badge>
-            {sold ? <Badge tone="sold">Sold out</Badge> : <Badge tone="live">{product.qty} left</Badge>}
+            {sold ? (
+              <Badge tone="sold">Sold out</Badge>
+            ) : (
+              <Badge tone="live">{product.qty} left</Badge>
+            )}
           </div>
-          <h1 className="mt-4 font-display text-4xl text-foreground">{product.title}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{productMeta(product)}</p>
+          <ListingBadges product={product} className="mt-3" />
+          <div className="mt-4">
+            <ListingTitle product={product} as="h1" size="page" />
+          </div>
           <div className="mt-5 flex items-baseline gap-3">
             <p className="font-display text-3xl tabular-nums">{formatPrice(product.priceCents)}</p>
             {product.compareAtCents && product.compareAtCents > product.priceCents ? (
@@ -43,15 +53,16 @@ export function ProductView({ product, related }: { product: Product; related: P
                 {formatPrice(product.compareAtCents)}
               </p>
             ) : null}
-            {!sold ? <span className="text-sm text-muted-foreground">Buy now</span> : null}
           </div>
           {product.description ? (
-            <p className="mt-6 max-w-xl text-sm leading-relaxed text-foreground/90">{product.description}</p>
+            <p className="mt-6 max-w-xl text-sm leading-relaxed text-foreground/90">
+              {product.description}
+            </p>
           ) : null}
           {product.imageDepiction ? (
             <p className="mt-4 max-w-xl text-sm text-muted-foreground">
-              This is a depiction of the card. The listing photo was AI-enhanced for shop quality. You receive the
-              physical card described, in the condition noted.
+              This is a depiction of the card. The listing photo was AI-enhanced for shop quality.
+              You receive the physical card described, in the condition noted.
             </p>
           ) : null}
 
@@ -60,6 +71,7 @@ export function ProductView({ product, related }: { product: Product; related: P
               <AddToCart product={product} />
             </div>
             <ShareKit product={product} />
+            <TrustStrip compact />
             <p className="text-xs text-muted-foreground">
               Buy now opens Stripe checkout — no account needed. Ships after payment.
             </p>
@@ -87,7 +99,9 @@ export function ListingMissing() {
   return (
     <main className="mx-auto max-w-xl px-4 py-24 text-center">
       <h1 className="font-display text-3xl">That listing walked.</h1>
-      <p className="mt-2 text-sm text-muted-foreground">The buy link does not match anything in the hub.</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        The buy link does not match anything in the hub.
+      </p>
       <Link to="/shop" className="mt-6 inline-block text-sm text-primary">
         Back to the shop
       </Link>

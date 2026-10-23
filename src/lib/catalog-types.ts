@@ -134,16 +134,23 @@ export function inferSport(...parts: Array<string | null | undefined>): SportId 
   return null;
 }
 
-export function resolveSport(selected: SportId, ...hints: Array<string | null | undefined>): SportId {
+export function resolveSport(
+  selected: SportId,
+  ...hints: Array<string | null | undefined>
+): SportId {
   return inferSport(...hints) ?? selected;
 }
 
 /** Resolve old/imported listings as well as new uploads, without rewriting inventory. */
-export function listingSport(product: Pick<Product, "sport" | "title" | "player" | "setName" | "parallel" | "description">): string {
-  return inferSport(product.title, product.player, product.setName, product.parallel)
-    ?? inferSport(product.description)
-    ?? inferSport(product.sport)
-    ?? product.sport;
+export function listingSport(
+  product: Pick<Product, "sport" | "title" | "player" | "setName" | "parallel" | "description">,
+): string {
+  return (
+    inferSport(product.title, product.player, product.setName, product.parallel) ??
+    inferSport(product.description) ??
+    inferSport(product.sport) ??
+    product.sport
+  );
 }
 
 /** WNBA is both its own category and part of the overall basketball inventory. */
@@ -153,12 +160,23 @@ export function matchesSport(actual: string, requested: string): boolean {
 }
 
 /** Autographs can also be singles, slabs, or patch cards. */
-export function matchesKind(product: Pick<Product, "kind" | "title" | "setName" | "parallel" | "description">, requested: string): boolean {
+export function matchesKind(
+  product: Pick<Product, "kind" | "title" | "setName" | "parallel" | "description">,
+  requested: string,
+): boolean {
   if (requested === "sealed") return product.kind === "sealed" || product.kind === "break-spot";
   if (product.kind === requested) return true;
-  if (requested !== "auto" || product.kind === "sealed" || product.kind === "break-spot") return false;
-  const details = [product.title, product.setName, product.parallel, product.description].filter(Boolean).join(" ");
-  if (/\b(?:non[- ]?auto|no autograph|not autographed|unsigned|facsimile|printed signature)\b/i.test(details)) return false;
+  if (requested !== "auto" || product.kind === "sealed" || product.kind === "break-spot")
+    return false;
+  const details = [product.title, product.setName, product.parallel, product.description]
+    .filter(Boolean)
+    .join(" ");
+  if (
+    /\b(?:non[- ]?auto|no autograph|not autographed|unsigned|facsimile|printed signature)\b/i.test(
+      details,
+    )
+  )
+    return false;
   return /\b(?:auto(?:s|graph(?:s|ed)?)?|on[- ]card auto|signed|signature(?:s)?)\b/i.test(details);
 }
 
@@ -167,20 +185,19 @@ export function kindLabel(id: string) {
   return KINDS.find((k) => k.id === id)?.label ?? id;
 }
 
-export function productImageSrc(product: {
-  imageKey?: string | null;
-  imageUrl?: string | null;
-}) {
+export function productImageSrc(product: { imageKey?: string | null; imageUrl?: string | null }) {
   if (product.imageUrl) return product.imageUrl;
   if (!product.imageKey || product.imageKey === "face") return null;
-  return `/cards/${product.imageKey}.jpg`;
+  return `/cards/${product.imageKey}.webp`;
 }
 
 export function listingPath(product: Pick<Product, "slug" | "shortCode">) {
   return product.shortCode ? `/v/${product.shortCode}` : `/c/${product.slug}`;
 }
 
-export function productMeta(product: Pick<Product, "setName" | "parallel" | "serialNum" | "grade" | "year">) {
+export function productMeta(
+  product: Pick<Product, "setName" | "parallel" | "serialNum" | "grade" | "year">,
+) {
   return [product.year, product.setName, product.parallel, product.serialNum, product.grade]
     .filter(Boolean)
     .join(" · ");
