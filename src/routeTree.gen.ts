@@ -19,6 +19,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ScoresRouteImport } from './routes/scores'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
+import { Route as DeskOrdersRouteImport } from './routes/desk_.orders'
 import { Route as DropSlugRouteImport } from './routes/drop.$slug'
 import { Route as OrderCodeRouteImport } from './routes/order.$code'
 import { Route as OrderStripeRouteImport } from './routes/order.stripe'
@@ -78,6 +79,11 @@ const CSlugRoute = CSlugRouteImport.update({
   path: '/c/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeskOrdersRoute = DeskOrdersRouteImport.update({
+  id: '/desk_/orders',
+  path: '/desk/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DropSlugRoute = DropSlugRouteImport.update({
   id: '/drop/$slug',
   path: '/drop/$slug',
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
+  '/desk/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
+  '/desk/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/scores': typeof ScoresRouteWithChildren
   '/shop': typeof ShopRoute
   '/c/$slug': typeof CSlugRoute
+  '/desk_/orders': typeof DeskOrdersRoute
   '/drop/$slug': typeof DropSlugRoute
   '/order/$code': typeof OrderCodeRoute
   '/order/stripe': typeof OrderStripeRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/scores'
     | '/shop'
     | '/c/$slug'
+    | '/desk/orders'
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/shop'
     | '/c/$slug'
+    | '/desk/orders'
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/scores'
     | '/shop'
     | '/c/$slug'
+    | '/desk_/orders'
     | '/drop/$slug'
     | '/order/$code'
     | '/order/stripe'
@@ -253,6 +265,7 @@ export interface RootRouteChildren {
   ScoresRoute: typeof ScoresRouteWithChildren
   ShopRoute: typeof ShopRoute
   CSlugRoute: typeof CSlugRoute
+  DeskOrdersRoute: typeof DeskOrdersRoute
   DropSlugRoute: typeof DropSlugRoute
   OrderCodeRoute: typeof OrderCodeRoute
   OrderStripeRoute: typeof OrderStripeRoute
@@ -331,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/c/$slug'
       fullPath: '/c/$slug'
       preLoaderRoute: typeof CSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desk_/orders': {
+      id: '/desk_/orders'
+      path: '/desk/orders'
+      fullPath: '/desk/orders'
+      preLoaderRoute: typeof DeskOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/drop/$slug': {
@@ -416,6 +436,7 @@ const rootRouteChildren: RootRouteChildren = {
   ScoresRoute: ScoresRouteWithChildren,
   ShopRoute: ShopRoute,
   CSlugRoute: CSlugRoute,
+  DeskOrdersRoute: DeskOrdersRoute,
   DropSlugRoute: DropSlugRoute,
   OrderCodeRoute: OrderCodeRoute,
   OrderStripeRoute: OrderStripeRoute,
