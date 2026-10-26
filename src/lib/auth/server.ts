@@ -160,7 +160,29 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,
     cookieCache: { enabled: true, maxAge: 300 },
   },
-  ...(emailAndPasswordEnabled ? { emailAndPassword: { enabled: true } } : {}),
+  ...(emailAndPasswordEnabled ? { emailAndPassword: {
+    enabled: true,
+    sendResetPassword: async ({ user, url }: { user: { email: string }; url: string }) => {
+      const key = process.env.RESEND_API_KEY?.trim();
+      const from = process.env.PASSWORD_RESET_FROM_EMAIL?.trim();
+      if (!key || !from) throw new Error("Password reset email is not configured");
+      const link = new URL(url);
+      if (link.protocol !== "https:" || !["pnwcardhub.app", "www.pnwcardhub.app"].includes(link.hostname)) {
+        throw new Error("Invalid password reset destination");
+      }
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from,
+          to: [user.email],
+          subject: "Reset your PNW Card Vault password",
+          text: `A password reset was requested for your PNW Card Vault account. Use this one-time link to choose a new password: ${url}\n\nIf you did not request this, ignore this email.`,
+        }),
+      });
+      if (!response.ok) throw new Error("Unable to send password reset email");
+    },
+  } } : {}),
   advanced: {
     useSecureCookies: false,
     defaultCookieAttributes: {

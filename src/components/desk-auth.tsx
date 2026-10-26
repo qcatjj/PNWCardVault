@@ -1,5 +1,5 @@
 import { Delete } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { type FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -219,6 +219,7 @@ function DeskSignIn({ onDone }: { onDone?: () => void }) {
           {busy ? "Opening…" : "Open desk"}
         </Button>
       </form>
+      <p className="text-center text-sm"><Link to="/forgot-password" className="underline">Forgot password?</Link></p>
       <p className="text-xs text-muted-foreground">Use email on iPhone — Google and X often get blocked there.</p>
       <div className="space-y-2">
         {GROK_PROVIDERS.map((provider) => (
