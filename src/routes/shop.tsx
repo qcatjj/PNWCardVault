@@ -3,6 +3,7 @@ import { ProductGrid } from "@/components/product-card";
 import { KINDS, SPORTS, type Product } from "@/lib/catalog-types";
 import { gradeInfo, inBand, PRICE_BANDS, teamOf } from "@/lib/listing-facts";
 import { useEffect, useState } from "react";
+import { CATALOG_CACHE_CONTROL, CATALOG_CACHE_MS } from "@/lib/catalog-cache";
 import { listProducts } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +44,9 @@ export const Route = createFileRoute("/shop")({
     q: search.q,
     sort: search.sort,
   }),
+  staleTime: CATALOG_CACHE_MS,
+  preloadStaleTime: CATALOG_CACHE_MS,
+  headers: () => ({ "Cache-Control": CATALOG_CACHE_CONTROL }),
   loader: ({ deps }) => listProducts({ data: deps }),
   head: () => ({
     meta: [

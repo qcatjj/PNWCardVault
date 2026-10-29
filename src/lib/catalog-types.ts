@@ -96,7 +96,7 @@ export function sportLabel(id: string) {
   return SPORTS.find((s) => s.id === id)?.label ?? id;
 }
 
-const SPORT_HINTS: { id: SportId; re: RegExp }[] = [
+export const SPORT_HINTS: { id: SportId; re: RegExp }[] = [
   {
     id: "wnba",
     re: /\bwnba\b|caitlin clark|paige bueckers|napheesa|angel reese|a'?ja wilson|breanna stewart|cameron brink|kelsey plum|sue bird|diana taurasi|sabrina ionescu|jewell loyd|candace parker|lisa leslie|seattle storm|las vegas aces|new york liberty|indiana fever/,
@@ -152,14 +152,20 @@ export function matchesSport(actual: string, requested: string): boolean {
   return actual === sport || (sport === "basketball" && actual === "wnba");
 }
 
+/** Text that marks a single, slab, or relic as an autograph. */
+export const AUTO_DETAIL_RE =
+  /\b(?:auto(?:s|graph(?:s|ed)?)?|on[- ]card auto|signed|signature(?:s)?)\b/i;
+export const NON_AUTO_DETAIL_RE =
+  /\b(?:non[- ]?auto|no autograph|not autographed|unsigned|facsimile|printed signature)\b/i;
+
 /** Autographs can also be singles, slabs, or patch cards. */
 export function matchesKind(product: Pick<Product, "kind" | "title" | "setName" | "parallel" | "description">, requested: string): boolean {
   if (requested === "sealed") return product.kind === "sealed" || product.kind === "break-spot";
   if (product.kind === requested) return true;
   if (requested !== "auto" || product.kind === "sealed" || product.kind === "break-spot") return false;
   const details = [product.title, product.setName, product.parallel, product.description].filter(Boolean).join(" ");
-  if (/\b(?:non[- ]?auto|no autograph|not autographed|unsigned|facsimile|printed signature)\b/i.test(details)) return false;
-  return /\b(?:auto(?:s|graph(?:s|ed)?)?|on[- ]card auto|signed|signature(?:s)?)\b/i.test(details);
+  if (NON_AUTO_DETAIL_RE.test(details)) return false;
+  return AUTO_DETAIL_RE.test(details);
 }
 
 export function kindLabel(id: string) {

@@ -3,10 +3,13 @@ import { publicImageUrls } from "@/lib/listing-facts";
 import { z } from "zod";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { requireOwner } from "@/lib/desk-owner";
+import { CATALOG_CACHE_MS } from "./catalog-cache";
+import { PRODUCT_COLUMNS, buildListQuery, buildRelatedQuery } from "./catalog-query";
+import { publicImageSql, storedBackImage, storedFrontImage } from "./listing-image";
 import { slugify } from "./utils";
 import { chargeTestToken } from "./stripe-test";
 import type { Drop, ListFilters, Order, OrderItem, OrderPayment, Product } from "./catalog-types";
-import { listingSport, matchesKind, matchesSport } from "./catalog-types";
+import { listingSport } from "./catalog-types";
 import type { Sql } from "./db";
 
 type ProductRow = {
@@ -38,34 +41,16 @@ type ProductRow = {
   queuePos: number | null;
 };
 
-const productSelect = `
-  p.id,
-  p.slug,
-  p.title,
-  p.player,
-  p.set_name as "setName",
-  p.year,
-  p.sport,
-  p.kind,
-  p.parallel,
-  p.serial_num as "serialNum",
-  p.grade,
-  p.price_cents as "priceCents",
-  p.compare_at_cents as "compareAtCents",
-  p.qty,
-  p.description,
-  p.image_key as "imageKey",
-  p.image_url as "imageUrl",
-  p.image_url_back as "imageUrlBack",
-  p.image_depiction as "imageDepiction",
-  p.featured,
-  p.drop_id as "dropId",
-  p.short_code as "shortCode",
-  p.on_block as "onBlock",
-  p.queue_pos as "queuePos",
-  d.slug as "dropSlug",
-  d.title as "dropTitle"
-`;
+const catalogCache = new Map<string, { at: number; products: Product[] }>();
+
+export function invalidateCatalogCache() {
+  catalogCache.clear();
+}
+
+function rememberCatalog(key: string, products: Product[]) {
+  if (catalogCache.size > 40) catalogCache.clear();
+  catalogCache.set(key, { at: Date.now(), products });
+}
 
 function mapProduct(row: ProductRow): Product {
   return {
@@ -100,8 +85,6 @@ const filtersSchema = z.object({
 export const listProducts = createServerFn({ method: "GET" })
   .validator(filtersSchema)
   .handler(async ({ data }): Promise<Product[]> => {
-    const { getSql } = await import("./db");
-    const sql = await getSql();
     const filters: ListFilters = {
       sport: data.sport ?? undefined,
       kind: data.kind ?? undefined,
@@ -112,48 +95,18 @@ export const listProducts = createServerFn({ method: "GET" })
       sort: data.sort ?? undefined,
       limit: data.limit ?? undefined,
     };
-    const clauses: string[] = [];
-    const params: unknown[] = [];
-    let i = 1;
-
-    // Resolve categories before filtering or limiting. Autographed singles,
-    // slabs, and relics belong in Autos too, regardless of their saved kind.
-    if (filters.dropSlug) {
-      clauses.push(`d.slug = $${i++}`);
-      params.push(filters.dropSlug);
+    const query = buildListQuery(filters);
+    const cacheKey = `${query.text}\n${JSON.stringify(query.params)}`;
+    const hit = catalogCache.get(cacheKey);
+    if (hit && Date.now() - hit.at < CATALOG_CACHE_MS) {
+      return hit.products.map((product) => ({ ...product }));
     }
-    if (filters.featured) clauses.push(`p.featured = true`);
-    if (filters.inStock) clauses.push(`p.qty > 0`);
-    if (filters.q?.trim()) {
-      clauses.push(
-        `(p.title ilike $${i} or coalesce(p.player, '') ilike $${i} or coalesce(p.set_name, '') ilike $${i})`,
-      );
-      params.push(`%${filters.q.trim()}%`);
-      i += 1;
-    }
-
-    const where = clauses.length ? `where ${clauses.join(" and ")}` : "";
-    let order = "p.featured desc, p.id desc";
-    if (filters.sort === "price-asc") order = "p.price_cents asc, p.id desc";
-    if (filters.sort === "price-desc") order = "p.price_cents desc, p.id desc";
-    const limit = typeof filters.limit === "number" ? Math.min(Math.max(filters.limit, 1), 80) : null;
-
-    const rows = await sql.query<ProductRow>(
-      `select ${productSelect}
-       from products p
-       left join drops d on d.id = p.drop_id
-       ${where}
-       order by ${order}
-       ${limit && !filters.sport && !filters.kind ? `limit ${limit}` : ""}`,
-      params,
-    );
-    const products = rows.map(mapProduct);
-    const matching = products.filter((product) =>
-      (!filters.sport || matchesSport(product.sport, filters.sport)) &&
-      (!filters.kind || matchesKind(product, filters.kind))
-    );
-    const out = limit ? matching.slice(0, limit) : matching;
-    return out.map(publicImageUrls);
+    const { getSql } = await import("./db");
+    const sql = await getSql();
+    const rows = await sql.query<ProductRow>(query.text, query.params);
+    const products = rows.map((row) => publicImageUrls(mapProduct(row)));
+    rememberCatalog(cacheKey, products);
+    return products.map((product) => ({ ...product }));
   });
 
 export const getProduct = createServerFn({ method: "GET" })
@@ -162,7 +115,7 @@ export const getProduct = createServerFn({ method: "GET" })
     const { getSql } = await import("./db");
     const sql = await getSql();
     const rows = await sql.query<ProductRow>(
-      `select ${productSelect}
+      `select ${PRODUCT_COLUMNS}
        from products p
        left join drops d on d.id = p.drop_id
        where (p.slug = $1 or lower(coalesce(p.short_code, '')) = lower($1))
@@ -170,6 +123,22 @@ export const getProduct = createServerFn({ method: "GET" })
       [data.slug],
     );
     return rows[0] ? publicImageUrls(mapProduct(rows[0])) : null;
+  });
+
+export const listRelated = createServerFn({ method: "GET" })
+  .validator(
+    z.object({
+      sport: z.string().min(1).max(40),
+      excludeId: z.number().int().positive(),
+      limit: z.number().int().min(1).max(8).optional(),
+    }),
+  )
+  .handler(async ({ data }): Promise<Product[]> => {
+    const { getSql } = await import("./db");
+    const sql = await getSql();
+    const query = buildRelatedQuery(data);
+    const rows = await sql.query<ProductRow>(query.text, query.params);
+    return rows.map((row) => publicImageUrls(mapProduct(row)));
   });
 
 type DropRow = {
@@ -219,20 +188,23 @@ export const getDrop = createServerFn({ method: "GET" })
     );
     if (!drops[0]) return null;
     const products = await sql.query<ProductRow>(
-      `select ${productSelect}
+      `select ${PRODUCT_COLUMNS}
        from products p
        left join drops d on d.id = p.drop_id
        where d.slug = $1
        order by case when p.qty = 0 then 1 else 0 end, p.price_cents desc, p.id desc`,
       [data.slug],
     );
-    return { drop: mapDrop(drops[0]), products: products.map(mapProduct) };
+    return { drop: mapDrop(drops[0]), products: products.map((row) => publicImageUrls(mapProduct(row))) };
   });
 
 const imageUrlSchema = z
   .string()
   .max(280000)
-  .refine((value) => value.startsWith("https://") || value.startsWith("data:image/"), "Photo must be a URL or an uploaded image.");
+  .refine(
+    (value) => value.startsWith("https://") || value.startsWith("data:image/") || value.startsWith("/img/"),
+    "Photo must be a URL or an uploaded image.",
+  );
 
 export const createListing = createServerFn({ method: "POST" })
   .validator(
@@ -296,6 +268,7 @@ export const createListing = createServerFn({ method: "POST" })
         shortCode,
       ],
     );
+    invalidateCatalogCache();
     return { slug, shortCode };
   });
 
@@ -440,7 +413,7 @@ export const placeOrder = createServerFn({ method: "POST" })
            set qty = qty - $1
            where id = $2 and qty >= $1
            returning id, slug, title, price_cents as "priceCents", image_key as "imageKey",
-                     image_url as "imageUrl", qty`,
+                     ${publicImageSql("image_url", "front", "id")} as "imageUrl", qty`,
           [item.qty, item.productId],
         );
         const row = rows[0];
@@ -482,6 +455,7 @@ export const placeOrder = createServerFn({ method: "POST" })
       throw err;
     }
 
+    invalidateCatalogCache();
     return {
       code,
       items: snapshot,
@@ -518,7 +492,7 @@ export const getInventory = createServerFn({ method: "GET" })
     const { getSql } = await import("./db");
   const sql = await getSql();
   const productRows = await sql.query<ProductRow>(
-    `select ${productSelect}
+    `select ${PRODUCT_COLUMNS}
      from products p
      left join drops d on d.id = p.drop_id
      order by p.id desc`,
@@ -528,7 +502,10 @@ export const getInventory = createServerFn({ method: "GET" })
             payment_json as "paymentJson"
      from orders order by created_at desc limit 24`,
   );
-  return { products: productRows.map(mapProduct), orders: orderRows.map(mapOrder) };
+  return {
+    products: productRows.map((row) => publicImageUrls(mapProduct(row))),
+    orders: orderRows.map(mapOrder),
+  };
 });
 
 export const setListingQty = createServerFn({ method: "POST" })
@@ -543,6 +520,7 @@ export const setListingQty = createServerFn({ method: "POST" })
       data.productId,
     ]);
     if (!rows[0]) throw new Error("Listing not found.");
+    invalidateCatalogCache();
     return { ok: true };
   });
 
@@ -555,6 +533,7 @@ export const deleteListing = createServerFn({ method: "POST" })
     const sql = await getSql();
     const rows = await sql.query<{ id: number }>(`delete from products where id = $1 returning id`, [data.productId]);
     if (!rows[0]) throw new Error("Listing not found.");
+    invalidateCatalogCache();
     return { ok: true };
   });
 
@@ -586,6 +565,7 @@ export const updateListing = createServerFn({ method: "POST" })
     const { getSql } = await import("./db");
     const sql = await getSql();
     const sport = listingSport({ ...data, player: data.player ?? null, setName: data.setName ?? null, parallel: data.parallel ?? null, description: data.description ?? null });
+    const back = storedBackImage(data.imageUrlBack);
     const rows = await sql.query<{ id: number }>(
       `update products set
          title = $1,
@@ -602,9 +582,13 @@ export const updateListing = createServerFn({ method: "POST" })
          description = $12,
          featured = $13,
          image_url = coalesce($14, image_url),
-         image_url_back = $15,
-         image_depiction = $16
-       where id = $17
+         image_url_back = case $16
+           when 'keep' then image_url_back
+           when 'clear' then null
+           else $15
+         end,
+         image_depiction = $17
+       where id = $18
        returning id`,
       [
         data.title.trim(),
@@ -620,12 +604,14 @@ export const updateListing = createServerFn({ method: "POST" })
         data.qty,
         data.description?.trim() || null,
         Boolean(data.featured),
-        data.imageUrl?.trim() || null,
-        data.imageUrlBack === undefined ? null : data.imageUrlBack?.trim() || null,
+        storedFrontImage(data.imageUrl),
+        back.mode === "set" ? back.url : null,
+        back.mode,
         Boolean(data.imageDepiction),
         data.productId,
       ],
     );
     if (!rows[0]) throw new Error("Listing not found.");
+    invalidateCatalogCache();
     return { ok: true };
   });

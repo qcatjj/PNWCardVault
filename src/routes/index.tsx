@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { ProductGrid, ProductRail } from "@/components/product-card";
 import { PnwHero } from "@/components/pnw-hero";
 import { ScoreCard } from "@/components/score-card";
+import { CATALOG_CACHE_CONTROL, CATALOG_CACHE_MS } from "@/lib/catalog-cache";
 import { listProducts } from "@/lib/catalog";
 import type { Product } from "@/lib/catalog-types";
 import { getScoreboard, matchListings } from "@/lib/scores";
@@ -16,6 +17,9 @@ const BOXES = [
 ];
 
 export const Route = createFileRoute("/")({
+  staleTime: CATALOG_CACHE_MS,
+  preloadStaleTime: CATALOG_CACHE_MS,
+  headers: () => ({ "Cache-Control": CATALOG_CACHE_CONTROL }),
   loader: async () => {
     const [stock, games] = await Promise.all([
       listProducts({ data: { inStock: true, sort: "newest", limit: 48 } }),
