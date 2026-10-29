@@ -15,6 +15,7 @@ import { UserButton } from "@/lib/auth/gates";
 import { authEnabled } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { createListing, deleteListing, getInventory, setListingQty, updateListing, type Inventory } from "@/lib/catalog";
+import { listingPhotoPatch } from "@/lib/listing-image";
 import { KINDS, productName, resolveSport, SPORTS, type Product } from "@/lib/catalog-types";
 import type { CardMatch } from "@/lib/card-images";
 import { readCardFromPhoto, type CardIdentity } from "@/lib/card-read";
@@ -842,8 +843,7 @@ function EditCardForm({
           qty: Number.isFinite(nextQty) ? Math.max(0, Math.min(99, nextQty)) : product.qty,
           description: description || undefined,
           featured,
-          imageUrl: front || undefined,
-          imageUrlBack: back,
+          ...listingPhotoPatch(front, back),
           imageDepiction: photoMode === "enhanced",
         },
       });

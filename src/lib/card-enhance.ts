@@ -65,6 +65,22 @@ async function persistImage(url: string): Promise<string | null> {
   }
 }
 
+/** Owner enhance of an existing listing loads that one side. Catalog reads never do. */
+async function storedPhotoForEnhance(image: string): Promise<string | null> {
+  if (!image.startsWith("/img/")) return image;
+  const path = image.split("?")[0] ?? image;
+  const match = /^\/img\/(\d+)\/(front|back)-[a-z0-9]+\.webp$/i.exec(path);
+  if (!match) return null;
+  const column = match[2]!.toLowerCase() === "back" ? "image_url_back" : "image_url";
+  const { getSql } = await import("./db");
+  const sql = await getSql();
+  const rows = await sql.query<{ image: string | null }>(
+    `select ${column} as image from products where id = $1`,
+    [Number(match[1])],
+  );
+  return rows[0]?.image ?? null;
+}
+
 async function requestEdit(apiKey: string, model: string, prompt: string, image: string) {
   const res = await fetch("https://api.x.ai/v1/images/edits", {
     method: "POST",
@@ -105,6 +121,8 @@ export const enhanceListingPhoto = createServerFn({ method: "POST" })
       context,
     }): Promise<{ ok: true; url: string } | { ok: false; error: string }> => {
       await requireOwner(context.userId);
+      const image = await storedPhotoForEnhance(data.image);
+      if (!image) return { ok: false, error: "Could not read that photo." };
       const apiKey = process.env.XAI_API_KEY;
       if (!apiKey) {
         return {
@@ -118,7 +136,7 @@ export const enhanceListingPhoto = createServerFn({ method: "POST" })
 
       for (const model of MODELS) {
         try {
-          const result = await requestEdit(apiKey, model, prompt, data.image);
+          const result = await requestEdit(apiKey, model, prompt, image);
           if (!result.ok) {
             lastError = apiError(result.body, result.status);
             if (
